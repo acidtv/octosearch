@@ -55,6 +55,9 @@ class Output_ElasticSearch:
 	def _format_results(self, results):
 		'''Generator. Normalize elastic search results'''
 
+		if not 'hits' in results:
+			return
+
 		for document in results['hits']['hits']:
 			dump = {
 				'id': document['_id'], 

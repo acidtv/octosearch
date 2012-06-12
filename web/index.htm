@@ -1,0 +1,70 @@
+<html>
+<head>
+	<title>Ducky ElasticSearch Test</title>
+	<script language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<style>
+		* {
+			font-family: Arial;
+		}
+		em {
+			font-weight: bold;
+			background-color: yellow;
+		}
+
+		li {
+			font-weight: bold;
+		}
+
+		label {
+			width: 100px;
+			display: block;
+			float: left;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Ducky ElasticSearch Test</h1>
+
+	<form id="duckysearch">
+		<label>Search</label><input name="search" id="search" value="" /><br />
+		<label>Index</label><input name="index" id="index" value="ducky" /><br />
+		<input type="submit" value="Search" />
+	</form>
+
+	<h2>Search results</h2>
+	<div>
+		<ol id="results">
+		</ol>
+	</div>
+
+	<script language="javascript">
+		$('#duckysearch').submit(function() { 
+			// empty search results
+			$('#results').html('');
+
+			search = encodeURI($('#search').val());
+			$('#search').val('');
+
+			source = encodeURI('{ "highlight": { "fields": { "content": {}}} }');
+			index = $('#index').val();
+
+			$.ajax({
+				url: 'http://localhost:9200/' + index + '/_search?q=' + search + '&source=' + source,
+				dataType: 'jsonp',
+				success: function (data) {
+							$.each(data.hits.hits, function(i, item) {
+								$('<li>' + item._source.filename + '<span style="color: grey"> &mdash; ' + item._source.path + '</span></li>').appendTo('#results');
+								$.each(item.highlight.content, function(i, chunk) {
+									$('<span>' + chunk + ' ...</span>').appendTo('#results');
+								});
+							});
+						}
+			});
+
+			return false;
+		});
+	</script>
+
+</body>
+</html>
