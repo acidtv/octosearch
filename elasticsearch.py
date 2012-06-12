@@ -15,7 +15,7 @@ class Output_ElasticSearch:
 	def add(self, id, info):
 		"""Add new document to index"""
 
-		self._es_call('put', '/' + self.index + '/document/' + id, info)
+		result = self._es_call('put', '/' + self.index + '/document/' + id, info)
 
 	def get_all(self):
 		'''Generator. Returns the entire index'''
@@ -30,13 +30,42 @@ class Output_ElasticSearch:
 			url = '/' + self.index + '/document/_search?path:*&fields=path,filename&from=' + str(pagefrom) + '&size=' + str(pagesize)
 			result = self._es_call('get', url, None)
 
-			for document in result['hits']['hits']:
-				try:
-					dump = {'path': document['fields']['path'], 'filename': document['fields']['filename']}
-				except KeyError:
-					continue
+			for document in self._format_results(result):
+				yield document
 
-				yield dump
+	def get_keys(self, keys):
+		'''Returns list with specified keys'''
+
+		query = {
+			'size': 100000,
+			'fields': ['id', 'path', 'filename', 'created', 'modified', 'mimetype'],
+			'query': { 'ids': {'values': keys} }
+		}
+
+		result = self._es_call('get', '/' + self.index + '/document/_search', query)
+
+		return self._format_results(result)
+
+	def remove(self, files):
+		'''Remove files from index'''
+
+		query = {'ids': {'values': files}}
+		self._es_call('delete', '/' + self.index + '/document/_query', query)
+
+	def _format_results(self, results):
+		'''Generator. Normalize elastic search results'''
+
+		for document in results['hits']['hits']:
+			dump = {
+				'id': document['_id'], 
+				'path': document['fields'].get('path'), 
+				'filename': document['fields'].get('filename'),
+				'created': document['fields'].get('created'), 
+				'modified': document['fields'].get('modified'), 
+				'mimetype': document['fields'].get('mimetype')
+			}
+
+			yield dump	
 
 	def _es_call(self, method, url, content):
 		'''Call elastic search server'''

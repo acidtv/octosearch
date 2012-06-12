@@ -1,22 +1,35 @@
 #!/usr/bin/python
 
+import argparse
 from indexer import Indexer
 from elasticsearch import Output_ElasticSearch
 
 class Ducky:
-	def start(self):
+	def start(self, args):
 		logger = Logger()
-		output = Output_ElasticSearch('127.0.0.1', 'ducky')
+		output = Output_ElasticSearch(args.es_server, args.index)
 		indexer = Indexer(logger, output)
 		
-		indexer.check_removed()
-		
-		#indexer.directory('/home/alex/code/ducky')
+		if args.check_removed:
+			indexer.check_removed()
+
+		if args.index_dir:
+			indexer.directory(args.index_dir)
 
 
 class Logger:
 	def add(self, text):
-		print '[LOG]:', text
+		print text
 
-app = Ducky()
-app.start()
+if __name__ == '__main__':
+	parser = argparse.ArgumentParser(description='Filesystem indexer')
+	parser.add_argument('-i', dest='index_dir', required=False, help='Start indexing dir.')
+	parser.add_argument('-cr', dest='check_removed', required=False, action='store_true', help='Check index for removed files.')
+	parser.add_argument('-if', dest='ignore_files', required=False, help='Files to ignore. Regular expressions can be used.')
+	parser.add_argument('-im', dest='ignore_mimes', required=False, help='Mimetypes to ignore. Regular expressions can be used.')
+	parser.add_argument('--es-server', dest='es_server', default='127.0.0.1', required=False, help='Elastic search server host.')
+	parser.add_argument('index', help='The index to operate on')
+	args = parser.parse_args()
+
+	app = Ducky()
+	app.start(args)

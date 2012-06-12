@@ -18,29 +18,51 @@ class Indexer:
 	def directory(self, root):
 		"""Index a directory"""
 
-		stack = [root]
+		dirstack = [root]
 
 		# walk filesystem
-		while stack:
-			path = stack.pop()
+		while dirstack:
+			path = dirstack.pop()
+			filestack = {}
+
+			#self.logger.add(path)
 
 			for file in os.listdir(path):
-				full_path = path + '/' + file
+				full_path = os.path.join(path, file)
 
+				# if dir add to stack
 				if os.path.isdir(full_path):
-					stack.append(full_path)
+					dirstack.append(full_path)
 					continue
 
-				self.file(path, file)
+				# save files to check modified date later
+				statdata = os.stat(full_path)
+				filestack[hashlib.md5(full_path).hexdigest()] = {'file': file, 'path': path, 'stat': statdata}
+
+			if not filestack:
+				continue
+
+			documents = self.output.get_keys(filestack.keys())
+
+			for document in documents:
+				# compare modified date from index with filesystem
+				file = filestack.pop(document['id'])
+				if file['stat'].st_mtime > document['modified']:
+					self.file(file['path'], file['file'])
+
+			# new files
+			for file in filestack:
+				self.file(filestack[file]['path'], filestack[file]['file'])
+
 
 	def file(self, path, file):
 		'''Index a file'''
 
-		file_full = path + '/' + file
+		file_full = os.path.join(path, file)
 		mimetype = mimetypes.guess_type(file_full)[0]
 		parser = self.get_parser(mimetype)
 
-		self.logger.add(file_full + '(' + str(mimetype) + ')')
+		self.logger.add(file_full + ' (' + str(mimetype) + ')')
 
 		statdata = os.stat(file_full)
 
@@ -61,11 +83,18 @@ class Indexer:
 
 		self.logger.add('Checking index for removed files...')
 
+		removed = []
 		documents = self.output.get_all()
 
 		for document in documents:
-			self.logger.add(document)
-			i = 0
+			file_full = os.path.join(document['path'], document['filename'])
+			if not os.path.isfile(file_full):
+					self.logger.add('Removed: ' + file_full)
+					removed.append(document['id'])
+
+		if removed:
+			self.logger.add('Waiting for search engine to process removed files...')
+			self.output.remove(removed)
 
 	def get_parser(self, mimetype):
 		if mimetype in self.parsers:
