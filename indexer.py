@@ -5,15 +5,15 @@ import mimetypes
 import hashlib
 
 class Indexer:
-	logger = None
-	output = None
+	_logger = None
+	_output = None
+	_plugins = None
 
-	parsers = {}
-
-	def __init__(self, logger, output):
-		self.logger = logger
-		self.output = output
-		self.init_parsers()
+	def __init__(self, logger, output, plugins):
+		self._logger = logger
+		self._output = output
+		self._plugins = plugins
+		#self.init_parsers()
 
 	def directory(self, root):
 		"""Index a directory"""
@@ -42,7 +42,7 @@ class Indexer:
 			if not filestack:
 				continue
 
-			documents = self.output.get_keys(filestack.keys())
+			documents = self._output.get_keys(filestack.keys())
 
 			for document in documents:
 				# compare modified date from index with filesystem
@@ -60,9 +60,11 @@ class Indexer:
 
 		file_full = os.path.join(path, file)
 		mimetype = mimetypes.guess_type(file_full)[0]
-		parser = self.get_parser(mimetype)
+		extension = self._get_extension(file)
 
-		self.logger.add(file_full + ' (' + str(mimetype) + ')')
+		parser = self._plugins.get(mimetype, extension)
+
+		self._logger.add(file_full + ' (' + str(mimetype) + ')')
 
 		statdata = os.stat(file_full)
 
@@ -76,50 +78,31 @@ class Indexer:
 
 		id = hashlib.md5(file_full).hexdigest()
 
-		self.output.add(id, info)
+		self._output.add(id, info)
 
 	def check_removed(self):
 		'''Check the index for removed files'''
 
-		self.logger.add('Checking index for removed files...')
+		self._logger.add('Checking index for removed files...')
 
 		removed = []
-		documents = self.output.get_all()
+		documents = self._output.get_all()
 
 		for document in documents:
 			file_full = os.path.join(document['path'], document['filename'])
 			if not os.path.isfile(file_full):
-					self.logger.add('Removed: ' + file_full)
+					self._logger.add('Removed: ' + file_full)
 					removed.append(document['id'])
 
 		if removed:
-			self.logger.add('Waiting for search engine to process removed files...')
-			self.output.remove(removed)
+			self._logger.add('Waiting for search engine to process removed files...')
+			self._output.remove(removed)
 
-	def get_parser(self, mimetype):
-		if mimetype in self.parsers:
-			return self.parsers[mimetype]
-		else:
-			# return fallback parser
-			return self.parsers[None]
+	def _get_extension(self, file):
+		info = file.rpartition(os.extsep)
 
-	def init_parsers(self):
-		"""Load parsers to see which mimetypes they want 
-		to take care of"""
+		if info[0] != '' and info[2] != '':
+			return info[2]
 
-		for file in os.listdir('./parsers/'):
-			if file[-3:] != '.py' or file[:1] == '_':
-				continue
+		return ''
 
-			class_name = 'Parser_' + file[:-3].capitalize()
-			module_name = 'parsers.' + file[:-3].lower()
-
-			self.logger.add('Loading ' + module_name)
-
-			mod = __import__(module_name, globals(), locals(), [class_name])
-			obj = getattr(mod, class_name)()
-
-			mimes = obj.mime_types()
-
-			for mimetype in mimes:
-				self.parsers[mimetype] = obj

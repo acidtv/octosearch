@@ -2,7 +2,7 @@ import httplib
 import json
 import math
 
-class Output_ElasticSearch:
+class OutputElasticSearch:
 
 	server = None
 

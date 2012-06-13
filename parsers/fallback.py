@@ -1,6 +1,6 @@
 import re
 
-class Parser_Fallback:
+class ParserFallback:
 	def mime_types(self):
 		return [None]
 

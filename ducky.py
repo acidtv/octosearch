@@ -1,14 +1,17 @@
 #!/usr/bin/python
 
 import argparse
+
 from indexer import Indexer
-from elasticsearch import Output_ElasticSearch
+from elasticsearch import OutputElasticSearch
+from parserplugins import ParserPlugins
 
 class Ducky:
 	def start(self, args):
 		logger = Logger()
-		output = Output_ElasticSearch(args.es_server, args.index)
-		indexer = Indexer(logger, output)
+		output = OutputElasticSearch(args.es_server, args.index)
+		plugins = ParserPlugins()
+		indexer = Indexer(logger, output, plugins)
 		
 		if args.check_removed:
 			indexer.check_removed()
