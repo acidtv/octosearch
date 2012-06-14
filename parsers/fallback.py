@@ -1,8 +1,8 @@
 import re
 
 class ParserFallback:
-	def mime_types(self):
-		return [None]
+	def types(self):
+		return {'mimetypes': [None]}
 
 	def parse(self, file):
 		f = open(file)
