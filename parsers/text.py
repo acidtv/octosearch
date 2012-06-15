@@ -5,7 +5,7 @@ class ParserText:
 			'expressions': ['text/*']
 		}
 
-	def parse(self, file_full):
+	def parse(self, file_full, statdata):
 		'''Dump file contents straight back to indexer'''
 
 		file = open(file_full, 'r')

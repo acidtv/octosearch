@@ -9,6 +9,9 @@ class Indexer:
 	_output = None
 	_plugins = None
 
+	_ignore_mimetypes = []
+	_ignore_extensions = []
+
 	def __init__(self, logger, output, plugins):
 		self._logger = logger
 		self._output = output
@@ -28,6 +31,15 @@ class Indexer:
 			#self.logger.add(path)
 
 			for file in os.listdir(path):
+				extension = self._get_extension(file)
+				mimetype = self._get_mimetype(file)
+
+				if extension in self._ignore_extensions:
+					continue
+
+				if mimetype in self._ignore_mimetypes:
+					continue
+
 				full_path = os.path.join(path, file)
 
 				# if dir add to stack
@@ -37,7 +49,7 @@ class Indexer:
 
 				# save files to check modified date later
 				statdata = os.stat(full_path)
-				filestack[hashlib.md5(full_path).hexdigest()] = {'file': file, 'path': path, 'stat': statdata}
+				filestack[hashlib.md5(full_path).hexdigest()] = {'file': file, 'path': path, 'stat': statdata, 'mimetype': mimetype}
 
 			if not filestack:
 				continue
@@ -52,21 +64,23 @@ class Indexer:
 
 			# new files
 			for file in filestack:
-				self.file(filestack[file]['path'], filestack[file]['file'])
+				self.file(filestack[file]['path'], filestack[file]['file'], filestack[file]['mimetype'])
 
 
-	def file(self, path, file):
+	def file(self, path, file, mimetype=None):
 		'''Index a file'''
 
 		file_full = os.path.join(path, file)
-		mimetype = mimetypes.guess_type(file_full)[0]
+
+		if not mimetype:
+			mimetype = self._get_mimetype(file_full)
+
 		extension = self._get_extension(file)
+		statdata = os.stat(file_full)
 
 		parser = self._plugins.get(mimetype, extension)
 
 		self._logger.add(file_full + ' (' + str(mimetype) + ')')
-
-		statdata = os.stat(file_full)
 
 		info = {}
 		info['filename'] = file
@@ -74,7 +88,7 @@ class Indexer:
 		info['mimetype'] = mimetype
 		info['created'] = statdata.st_ctime
 		info['modified'] = statdata.st_mtime
-		info['content'] = parser.parse(file_full)
+		info['content'] = parser.parse(file_full, statdata)
 
 		id = hashlib.md5(file_full).hexdigest()
 
@@ -98,6 +112,12 @@ class Indexer:
 			self._logger.add('Waiting for search engine to process removed files...')
 			self._output.remove(removed)
 
+	def ignore_mimetypes(self, mimetypes):
+		self._ignore_mimetypes = mimetypes
+
+	def ignore_extensions(self, extensions):
+		self._extensions = extensions
+
 	def _get_extension(self, file):
 		info = file.rpartition(os.extsep)
 
@@ -105,4 +125,8 @@ class Indexer:
 			return info[2]
 
 		return ''
+
+	def _get_mimetype(self, file):
+		mimetype = mimetypes.guess_type(file)[0]
+		return mimetype
 

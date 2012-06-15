@@ -7,7 +7,7 @@ class ParserPdf:
 			'mimetypes': ['application/pdf']
 		}
 
-	def parse(self, file_full):
+	def parse(self, file_full, statdata):
 		pdf = PdfFileReader(file(file_full, 'rb'))
 
 		pages = pdf.getNumPages()

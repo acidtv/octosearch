@@ -11,13 +11,18 @@ class Ducky:
 		logger = Logger()
 		output = OutputElasticSearch(args.es_server, args.index)
 		plugins = ParserPlugins()
+		
 		indexer = Indexer(logger, output, plugins)
+		indexer.ignore_extensions(self.ignore_extensions)
 		
 		if args.check_removed:
 			indexer.check_removed()
 
 		if args.index_dir:
 			indexer.directory(args.index_dir)
+
+	def ignore_extensions(self):
+		return ['swp', 'bin', 'rar', 'iso', 'img', 'zip']
 
 
 class Logger:
