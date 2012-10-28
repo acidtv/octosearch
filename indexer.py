@@ -31,15 +31,6 @@ class Indexer:
 			#self.logger.add(path)
 
 			for file in os.listdir(path):
-				extension = self._get_extension(file)
-				mimetype = self._get_mimetype(file)
-
-				if extension in self._ignore_extensions:
-					continue
-
-				if mimetype in self._ignore_mimetypes:
-					continue
-
 				full_path = os.path.join(path, file)
 
 				# if dir add to stack
@@ -49,7 +40,7 @@ class Indexer:
 
 				# save files to check modified date later
 				statdata = os.stat(full_path)
-				filestack[hashlib.md5(full_path).hexdigest()] = {'file': file, 'path': path, 'stat': statdata, 'mimetype': mimetype}
+				filestack[hashlib.md5(full_path).hexdigest()] = {'file': file, 'path': path, 'stat': statdata}
 
 			if not filestack:
 				continue
@@ -64,23 +55,42 @@ class Indexer:
 
 			# new files
 			for file in filestack:
-				self.file(filestack[file]['path'], filestack[file]['file'], filestack[file]['mimetype'])
+				self.file(filestack[file]['path'], filestack[file]['file'])
 
 
-	def file(self, path, file, mimetype=None):
+	def file(self, path, file):
 		'''Index a file'''
 
 		file_full = os.path.join(path, file)
 
-		if not mimetype:
-			mimetype = self._get_mimetype(file_full)
-
+		mimetype = self._get_mimetype(file_full)
 		extension = self._get_extension(file)
 		statdata = os.stat(file_full)
 
-		parser = self._plugins.get(mimetype, extension)
-
 		self._logger.add(file_full + ' (' + str(mimetype) + ')')
+
+		call_parser = True
+
+		if extension in self._ignore_extensions:
+			call_parser = False
+
+		if mimetype in self._ignore_mimetypes:
+			call_parser = False
+
+		content = ''
+
+		if call_parser:
+			parser = self._plugins.get(mimetype, extension)
+
+			content = parser.parse(file_full, statdata)
+
+			if not isinstance(content, str):
+				raise Exception
+
+			extra = parser.extra()
+
+			if not isinstance(extra, dict):
+				raise Exception
 
 		info = {}
 		info['filename'] = file
@@ -88,7 +98,8 @@ class Indexer:
 		info['mimetype'] = mimetype
 		info['created'] = statdata.st_ctime
 		info['modified'] = statdata.st_mtime
-		info['content'] = parser.parse(file_full, statdata)
+		info['content'] = content 
+		info['extra'] = extra 
 
 		id = hashlib.md5(file_full).hexdigest()
 

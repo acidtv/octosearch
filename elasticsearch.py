@@ -52,6 +52,11 @@ class OutputElasticSearch:
 		query = {'ids': {'values': files}}
 		self._es_call('delete', '/' + self.index + '/document/_query', query)
 
+	def truncate(self):
+		'''Empty the entire index'''
+
+		self._es_call('delete', '/' + self.index + '/document')
+
 	def _format_results(self, results):
 		'''Generator. Normalize elastic search results'''
 
@@ -70,7 +75,7 @@ class OutputElasticSearch:
 
 			yield dump	
 
-	def _es_call(self, method, url, content):
+	def _es_call(self, method, url, content=None):
 		'''Call elastic search server'''
 
 		jsondoc = ''

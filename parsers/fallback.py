@@ -46,4 +46,7 @@ class ParserFallback:
 				parsed += ' ' + word.lower()
 
 		return parsed
+
+	def extra(self):
+		return {}
 				

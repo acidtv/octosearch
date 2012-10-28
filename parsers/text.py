@@ -14,3 +14,6 @@ class ParserText:
 		file.close
 
 		return content
+
+	def extra(self):
+		return {}
