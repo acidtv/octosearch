@@ -50,7 +50,8 @@
 			index = $('#index').val();
 
 			$.ajax({
-				url: 'http://localhost:9200/' + index + '/_search?q=' + search + '&source=' + source,
+				//url: 'http://localhost:9200/' + index + '/_search?q=' + search + '&source=' + source,
+				url: '/api/elasticsearch/' + index + '/_search?q=' + search + '&source=' + source,
 				dataType: 'jsonp',
 				success: function (data) {
 							$.each(data.hits.hits, function(i, item) {

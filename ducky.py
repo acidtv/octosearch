@@ -9,10 +9,10 @@ from parserplugins import ParserPlugins
 class Ducky:
 	def start(self, args):
 		logger = Logger()
-		output = OutputElasticSearch(args.es_server, args.index)
-		plugins = ParserPlugins()
+		backend = OutputElasticSearch(args.es_server, args.index)
+		parsers = ParserPlugins()
 		
-		indexer = Indexer(logger, output, plugins)
+		indexer = Indexer(logger, backend, parsers)
 		indexer.ignore_extensions(self.ignore_extensions)
 		
 		if args.check_removed:
@@ -22,7 +22,11 @@ class Ducky:
 			indexer.directory(args.index_dir)
 
 		if args.truncate:
-			output.truncate()
+			backend.truncate()
+
+		if args.webserver:
+			import webserver
+			webserver.start(backend)
 
 	def ignore_extensions(self):
 		return ['swp', 'bin', 'rar', 'iso', 'img', 'zip']
@@ -40,6 +44,7 @@ if __name__ == '__main__':
 	parser.add_argument('-if', dest='ignore_files', required=False, help='Files to ignore. Regular expressions can be used.')
 	parser.add_argument('-im', dest='ignore_mimes', required=False, help='Mimetypes to ignore. Regular expressions can be used.')
 	parser.add_argument('--es-server', dest='es_server', default='127.0.0.1', required=False, help='Elastic search server host.')
+	parser.add_argument('--webserver', dest='webserver', required=False, action='store_true', help='Start the webserver interface.')
 	parser.add_argument('index', help='The index to operate on')
 	args = parser.parse_args()
 
