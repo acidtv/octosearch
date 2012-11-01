@@ -1,10 +1,13 @@
 import BaseHTTPServer
 import re
 import os
+import json
+from urlparse import urlparse
 
 def start(backend):
 	address = ('', 8080)
 	server = DuckyWebServer(address, DuckyWebRequest)
+	server.set_backend(backend)
 	server.serve_forever()
 
 class DuckyWebServer(BaseHTTPServer.HTTPServer):
@@ -68,14 +71,22 @@ class DuckyWebRequest(BaseHTTPServer.BaseHTTPRequestHandler):
 			self.send_error(404)
 			return
 
-		print path[1]
-		if path[1] != '_search':
+		joined_path = '/'.join(path[1:])
+		url = urlparse(path[2])
+
+		if url.path != '_search':
 			self.send_error(403)
 			return
 
-		es_path = '/' + '/'.join(path[1:])
-		print 'es path', es_path
+		es_path = '/' + joined_path
+		print 'es path', joined_path
 
-		data = self.server.backend._es_call(method)
+		data = self.server.backend._es_call(method, joined_path)
+
+		self.send_response(200)
+		self.end_headers()
+
+		response = json.dumps(data)
+		self.wfile.write(response)
 
 		return

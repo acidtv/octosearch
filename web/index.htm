@@ -2,6 +2,7 @@
 <head>
 	<title>Ducky ElasticSearch Test</title>
 	<script language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script language="javascript" src="underscore-min.js"></script>
 	<style>
 		* {
 			font-family: Arial;
@@ -49,19 +50,16 @@
 			source = encodeURI('{ "highlight": { "fields": { "content": {}}} }');
 			index = $('#index').val();
 
-			$.ajax({
-				//url: 'http://localhost:9200/' + index + '/_search?q=' + search + '&source=' + source,
-				url: '/api/elasticsearch/' + index + '/_search?q=' + search + '&source=' + source,
-				dataType: 'jsonp',
-				success: function (data) {
-							$.each(data.hits.hits, function(i, item) {
-								$('<li>' + item._source.filename + '<span style="color: grey"> &mdash; ' + item._source.path + '</span></li>').appendTo('#results');
-								$.each(item.highlight.content, function(i, chunk) {
-									$('<span>' + chunk + ' ...</span>').appendTo('#results');
-								});
-							});
-						}
-			});
+			$.getJSON('/api/elasticsearch/' + index + '/_search?q=' + search + '&source=' + source,
+				function (data) {
+					$.each(data.hits.hits, function(i, item) {
+						$('<li>' + _.escape(item._source.filename) + '<span style="color: grey"> &mdash; ' + _.escape(item._source.path) + '</span></li>').appendTo('#results');
+						$.each(item.highlight.content, function(i, chunk) {
+							$('<span>' + _.escape(chunk) + ' ...</span>').appendTo('#results');
+						});
+					});
+				}
+			);
 
 			return false;
 		});

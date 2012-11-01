@@ -79,12 +79,13 @@ class OutputElasticSearch:
 		'''Call elastic search server'''
 
 		jsondoc = ''
+		method = method.upper()
 
 		if content:
 			jsondoc = json.dumps(content)
 
 		httpcon = httplib.HTTPConnection(self.server, 9200)
-		httpcon.request(method.upper(), url, jsondoc)
+		httpcon.request(method, url, jsondoc)
 		response = httpcon.getresponse()
 
 		jsondoc = json.loads(response.read())
