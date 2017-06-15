@@ -4,7 +4,7 @@ import os.path
 import mimetypes
 import hashlib
 
-class Indexer:
+class Localfs:
 	_logger = None
 	_output = None
 	_plugins = None
@@ -57,8 +57,11 @@ class Indexer:
 			for file in filestack:
 				self.file(filestack[file]['path'], filestack[file]['file'])
 
+	def index_file(self, path, file):
+		id, info = self.process_file(self, path, file)
+		self._output.add(id, info)
 
-	def file(self, path, file):
+	def process_file(self, path, file):
 		'''Index a file'''
 
 		file_full = os.path.join(path, file)
@@ -98,12 +101,12 @@ class Indexer:
 		info['mimetype'] = mimetype
 		info['created'] = statdata.st_ctime
 		info['modified'] = statdata.st_mtime
-		info['content'] = content 
-		info['extra'] = extra 
+		info['content'] = content
+		info['extra'] = extra
 
 		id = hashlib.md5(file_full).hexdigest()
 
-		self._output.add(id, info)
+		return (id, info)
 
 	def check_removed(self):
 		'''Check the index for removed files'''

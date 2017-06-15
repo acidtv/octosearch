@@ -2,3 +2,4 @@
 testfiles/*
 *.sublime-*
 TODO*
+.vimproject
