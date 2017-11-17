@@ -3,28 +3,14 @@
 	<title>Ducky ElasticSearch Test</title>
 	<script language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 	<script language="javascript" src="underscore-min.js"></script>
-	<style>
-		* {
-			font-family: Arial;
-		}
-		em {
-			font-weight: bold;
-			background-color: yellow;
-		}
-
-		li {
-			font-weight: bold;
-		}
-
-		label {
-			width: 100px;
-			display: block;
-			float: left;
-		}
-	</style>
+	<link href="/static/style.css" type="text/css" rel="stylesheet" />
 </head>
 
 <body>
+	<span class="menu">
+		<a href="/login">Login</a>
+	</span>
+
 	<h1>Ducky ElasticSearch Test</h1>
 
 	<form id="duckysearch">
@@ -40,7 +26,7 @@
 	</div>
 
 	<script language="javascript">
-		$('#duckysearch').submit(function() { 
+		$('#duckysearch').submit(function() {
 			// empty search results
 			$('#results').html('');
 

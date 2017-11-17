@@ -1,0 +1,22 @@
+* {
+	font-family: Arial;
+}
+em {
+	font-weight: bold;
+	background-color: yellow;
+}
+
+li {
+	font-weight: bold;
+}
+
+label {
+	width: 100px;
+	display: block;
+	float: left;
+}
+
+.menu {
+	float: right;
+}
+

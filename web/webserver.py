@@ -13,6 +13,10 @@ app = Flask(__name__)
 def index():
 	return render_template('index.html')
 
+@app.route('/login')
+def login():
+	return render_template('login.html')
+
 class DuckyWebRequest(BaseHTTPServer.BaseHTTPRequestHandler):
 	"""Obsolete webserver class. Keeping it around for api request forwarder code"""
 
