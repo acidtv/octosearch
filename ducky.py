@@ -2,7 +2,7 @@
 
 import argparse
 
-from indexer import Indexer
+# from indexer import Indexer
 from elasticsearch import OutputElasticSearch
 from parserplugins import ParserPlugins
 
@@ -11,10 +11,10 @@ class Ducky:
 		logger = Logger()
 		backend = OutputElasticSearch(args.es_server, args.index)
 		parsers = ParserPlugins()
-		
-		indexer = Indexer(logger, backend, parsers)
-		indexer.ignore_extensions(self.ignore_extensions)
-		
+
+		# indexer = Indexer(logger, backend, parsers)
+		# indexer.ignore_extensions(self.ignore_extensions)
+
 		if args.check_removed:
 			indexer.check_removed()
 
@@ -26,7 +26,7 @@ class Ducky:
 
 		if args.webserver:
 			import webserver
-			webserver.start(backend)
+			# webserver.start(backend)
 
 	def ignore_extensions(self):
 		return ['swp', 'bin', 'rar', 'iso', 'img', 'zip']

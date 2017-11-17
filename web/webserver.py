@@ -4,19 +4,18 @@ import os
 import json
 from urlparse import urlparse
 
-def start(backend):
-	address = ('', 8080)
-	server = DuckyWebServer(address, DuckyWebRequest)
-	server.set_backend(backend)
-	server.serve_forever()
+from flask import Flask
+from flask import render_template
 
-class DuckyWebServer(BaseHTTPServer.HTTPServer):
-	backend = None
+app = Flask(__name__)
 
-	def set_backend(self, backend):
-		self.backend = backend
+@app.route('/')
+def index():
+	return render_template('index.html')
 
 class DuckyWebRequest(BaseHTTPServer.BaseHTTPRequestHandler):
+	"""Obsolete webserver class. Keeping it around for api request forwarder code"""
+
 	def do_GET(self):
 		self._handle_request('get')
 
