@@ -4,18 +4,24 @@ import os
 import json
 from urlparse import urlparse
 
-from flask import Flask
-from flask import render_template
+from web import app
+from flask import render_template, request
+from .. import ldap
 
-app = Flask(__name__)
 
 @app.route('/')
 def index():
-	return render_template('index.html')
+    return render_template('index.html')
 
-@app.route('/login')
+
+@app.route('/login', methods=['POST', 'GET'])
 def login():
-	return render_template('login.html')
+    if request.method == 'POST':
+        ldaphelper = ldap.LDAPHelper()
+        ldaphelper.connect()
+        ldaphelper.authenticate(request.form['username'], request.form['password'])
+
+    return render_template('login.html')
 
 class DuckyWebRequest(BaseHTTPServer.BaseHTTPRequestHandler):
 	"""Obsolete webserver class. Keeping it around for api request forwarder code"""
