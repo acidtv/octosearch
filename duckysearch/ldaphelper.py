@@ -21,9 +21,14 @@ class LDAPHelper:
     def user_info(self, username):
         info_result_id = self._conn.search(self._search, ldap.SCOPE_SUBTREE, 'cn=' + username, ['cn', 'objectSid', 'memberof'])
         info_results = self._conn.result(info_result_id)
-        return info_results
+        return info_results[1][0]
 
     def groups(self, groups):
-        groups_result_id = self._conn.search(self._search, ldap.SCOPE_SUBTREE, '(|(cn=IT)(cn=Webteam)(cn=sshusers))', ['cn', 'objectSid'])
+        groups = ['cn=IT']
+        search = ')('.join(groups)
+        search = '(|(' + search + ')(cn=IT))'
+        print self._search, search
+        # groups_result_id = self._conn.search(self._search, ldap.SCOPE_SUBTREE, '(|(cn=IT)(cn=Webteam)(cn=sshusers))', ['cn', 'objectSid'])
+        groups_result_id = self._conn.search(self._search, ldap.SCOPE_SUBTREE, search, ['cn', 'objectSid'])
         groups_results = self._conn.result(groups_result_id)
         return groups_results

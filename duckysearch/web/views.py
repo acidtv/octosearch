@@ -29,7 +29,8 @@ def login():
         ldap.connect()
         ldap.authenticate(request.form['username'], request.form['password'])
         info = ldap.user_info(request.form['username'])
-        print info
+        groups = ldap.groups(info[1]['memberOf'])
+        print groups
 
         session['username'] = request.form['username']
 
