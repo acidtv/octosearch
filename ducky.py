@@ -3,30 +3,32 @@
 import argparse
 
 # from indexer import Indexer
-from elasticsearch import OutputElasticSearch
-from parserplugins import ParserPlugins
+# from elasticsearch import OutputElasticSearch
+# from parserplugins import ParserPlugins
+
+import duckysearch.web
+
 
 class Ducky:
     def start(self, args):
-        logger = Logger()
-        backend = OutputElasticSearch(args.es_server, args.index)
-        parsers = ParserPlugins()
+        # logger = Logger()
+        # backend = OutputElasticSearch(args.es_server, args.index)
+        # parsers = ParserPlugins()
 
         # indexer = Indexer(logger, backend, parsers)
         # indexer.ignore_extensions(self.ignore_extensions)
 
-        if args.check_removed:
-            indexer.check_removed()
+        # if args.check_removed:
+            # indexer.check_removed()
 
-        if args.index_dir:
-            indexer.directory(args.index_dir)
+        # if args.index_dir:
+            # indexer.directory(args.index_dir)
 
-        if args.truncate:
-            backend.truncate()
+        # if args.truncate:
+            # backend.truncate()
 
         if args.webserver:
-            import web
-            web.app.run(debug=True)
+            duckysearch.web.app.run(debug=True)
 
     def ignore_extensions(self):
         return ['swp', 'bin', 'rar', 'iso', 'img', 'zip']
@@ -35,6 +37,7 @@ class Ducky:
 class Logger:
     def add(self, text):
         print text
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Filesystem indexer')

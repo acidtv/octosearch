@@ -4,9 +4,9 @@ import os
 import json
 from urlparse import urlparse
 
-from web import app
+from . import app
 from flask import render_template, request
-from .. import ldap
+from .. import ldaphelper
 
 
 @app.route('/')
@@ -17,9 +17,9 @@ def index():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
-        ldaphelper = ldap.LDAPHelper()
-        ldaphelper.connect()
-        ldaphelper.authenticate(request.form['username'], request.form['password'])
+        ldap = ldaphelper.LDAPHelper()
+        ldap.connect()
+        ldap.authenticate(request.form['username'], request.form['password'])
 
     return render_template('login.html')
 
