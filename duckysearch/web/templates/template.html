@@ -10,6 +10,9 @@
 	<span class="menu">
 		<a href="/">Home</a> |
 		<a href="/login">Login</a>
+        {% if username %}
+            {{ username }}
+        {% endif %}
 	</span>
 
 	<h1>Ducky ElasticSearch Test</h1>

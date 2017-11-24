@@ -3,3 +3,4 @@ testfiles/*
 *.sublime-*
 TODO*
 .vimproject
+config.ini

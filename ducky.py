@@ -6,7 +6,8 @@ import argparse
 # from elasticsearch import OutputElasticSearch
 # from parserplugins import ParserPlugins
 
-import duckysearch.web
+import duckysearch
+from duckysearch import web
 
 
 class Ducky:
@@ -28,7 +29,7 @@ class Ducky:
             # backend.truncate()
 
         if args.webserver:
-            duckysearch.web.app.run(debug=True)
+            web.app.run(debug=True)
 
     def ignore_extensions(self):
         return ['swp', 'bin', 'rar', 'iso', 'img', 'zip']

@@ -4,9 +4,17 @@ import os
 import json
 from urlparse import urlparse
 
-from . import app
-from flask import render_template, request
+from . import app, conf
+from flask import render_template, request, session
 from .. import ldaphelper
+
+
+@app.context_processor
+def template_vars():
+    username = session['username'] if 'username' in session else ''
+    return dict(
+        username=username
+    )
 
 
 @app.route('/')
@@ -17,9 +25,15 @@ def index():
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
-        ldap = ldaphelper.LDAPHelper()
+        ldap = ldaphelper.LDAPHelper(conf.get('ldap', 'server'), conf.get('ldap', 'search'))
         ldap.connect()
         ldap.authenticate(request.form['username'], request.form['password'])
+        info = ldap.user_info(request.form['username'])
+        print info
+
+        session['username'] = request.form['username']
+
+        # FIXME get user groups info
 
     return render_template('login.html')
 
