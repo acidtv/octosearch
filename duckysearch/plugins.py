@@ -15,7 +15,9 @@ class Plugins:
 	def list_plugins(self):
 		'''Return a list of plugins for current type'''
 
-		for file in os.listdir('./' + self._type + '/'):
+                my_path = os.path.dirname(os.path.realpath(__file__))
+
+		for file in os.listdir(my_path + '/' + self._type + '/'):
 			if file[-3:] != '.py' or file[:1] == '_':
 				continue
 

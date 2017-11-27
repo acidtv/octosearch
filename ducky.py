@@ -7,16 +7,16 @@ import argparse
 # from parserplugins import ParserPlugins
 
 import duckysearch
-from duckysearch import web
+from duckysearch import web, elasticsearch, parserplugins, indexer
 
 
 class Ducky:
     def start(self, args):
-        # logger = Logger()
-        # backend = OutputElasticSearch(args.es_server, args.index)
-        # parsers = ParserPlugins()
+        logger = Logger()
+        backend = elasticsearch.OutputElasticSearch(args.es_server, args.index)
+        parsers = parserplugins.ParserPlugins()
 
-        # indexer = Indexer(logger, backend, parsers)
+        main_indexer = indexer.Indexer(['conf-placeholder'])
         # indexer.ignore_extensions(self.ignore_extensions)
 
         # if args.check_removed:
