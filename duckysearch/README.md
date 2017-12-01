@@ -19,6 +19,9 @@ To start the web interface:
 
  $ export FLASK_APP=web/webserver.py && export FLASK_DEBUG=1 && pipenv run flask run
 
+An elastic search server can be started with docker:
+
+ $ docker run docker.elastic.co/elasticsearch/elasticsearch:6.0.0
 
 LDAP Notes
 ----------
