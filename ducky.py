@@ -6,8 +6,7 @@ import argparse
 # from elasticsearch import OutputElasticSearch
 # from parserplugins import ParserPlugins
 
-import duckysearch
-from duckysearch import web, elasticsearch, parserplugins, indexers
+from duckysearch import web, parserplugins
 from duckysearch.indexers import mountedcifs
 from duckysearch.outputs import dummy
 
@@ -15,26 +14,25 @@ from duckysearch.outputs import dummy
 class Ducky:
     def start(self, args):
         logger = Logger()
-        backend = elasticsearch.OutputElasticSearch(args.es_server, args.index)
+        # backend = elasticsearch.OutputElasticSearch(args.es_server, args.index)
         parsers = parserplugins.ParserPlugins()
 
-        #main_indexer = indexer.Indexer(['conf-placeholder'])
+        # main_indexer = indexer.Indexer(['conf-placeholder'])
         # indexer.ignore_extensions(self.ignore_extensions)
 
         # if args.check_removed:
             # indexer.check_removed()
 
-        # if args.index_dir:
+        if args.index_dir:
             # indexer.directory(args.index_dir)
+            cifs_indexer = mountedcifs.Mountedcifs(logger, dummy.Dummyoutput(), parsers)
+            cifs_indexer.directory(args.index_dir)
 
         # if args.truncate:
             # backend.truncate()
 
         if args.webserver:
             web.app.run(debug=True)
-
-        cifs_indexer = mountedcifs.Mountedcifs(logger, dummy.Dummyoutput(), parsers)
-        cifs_indexer.directory('/mnt/tmp')
 
     def ignore_extensions(self):
         return ['swp', 'bin', 'rar', 'iso', 'img', 'zip']
