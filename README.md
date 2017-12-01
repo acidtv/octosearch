@@ -17,7 +17,7 @@ Development
 
 To start the web interface: 
 
- $ export FLASK_APP=web/webserver.py && export FLASK_DEBUG=1 && pipenv run flask run
+ $ pipenv run ./ducky.py --webserver indexname
 
 An elastic search server can be started with docker:
 
