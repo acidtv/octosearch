@@ -34,8 +34,6 @@ def login():
 
         session['username'] = request.form['username']
 
-        # FIXME get user groups info
-
     return render_template('login.html')
 
 class DuckyWebRequest(BaseHTTPServer.BaseHTTPRequestHandler):

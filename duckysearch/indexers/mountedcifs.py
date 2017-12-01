@@ -47,7 +47,6 @@ class Mountedcifs(localfs.Localfs):
 
         info = {'read_perms': self.parse_cifsacl(output)}
 
-        print info
         return info
 
     def parse_cifsacl(self, data):
