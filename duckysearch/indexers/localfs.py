@@ -60,7 +60,6 @@ class Localfs(object):
     def index_file(self, path, file):
         id, info = self.process_file(path, file)
         result = self._output.add(id, info)
-        print result
 
     def process_file(self, path, file):
         '''Index a file'''

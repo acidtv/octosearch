@@ -38,8 +38,9 @@ class Mountedcifs(localfs.Localfs):
 
     def process_file(self, path, file):
         id, info = super(Mountedcifs, self).process_file(path, file)
+        info.update(self.cifs_info(path, file))
 
-        return id, info.update(self.cifs_info(path, file))
+        return id, info
 
     def cifs_info(self, path, file):
         output = check_output(['getcifsacl', '-r', os.path.join(path, file)])
