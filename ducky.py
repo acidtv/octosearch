@@ -9,6 +9,7 @@ import argparse
 import duckysearch
 from duckysearch import web, elasticsearch, parserplugins, indexers
 from duckysearch.indexers import mountedcifs
+from duckysearch.outputs import dummy
 
 
 class Ducky:
@@ -32,7 +33,7 @@ class Ducky:
         if args.webserver:
             web.app.run(debug=True)
 
-        cifs_indexer = mountedcifs.Mountedcifs(logger, backend, parsers)
+        cifs_indexer = mountedcifs.Mountedcifs(logger, dummy.Dummyoutput(), parsers)
         cifs_indexer.directory('/mnt/tmp')
 
     def ignore_extensions(self):
