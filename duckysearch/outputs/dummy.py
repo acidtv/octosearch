@@ -3,7 +3,6 @@ class Dummyoutput(object):
 
     def add(self, id, info):
         """Add new document to index"""
-        print id, info
         return
 
     def get_all(self):
