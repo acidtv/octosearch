@@ -98,6 +98,7 @@ class Mountedcifs(localfs.Localfs):
     def acl_sids(self, acl):
         return [ace['sid'] for ace in acl]
 
+    # FIXME use format_sid from ldaphelper
     def format_sid(raw_value):
         """
         From: https://github.com/cannatag/ldap3/blob/master/ldap3/protocol/formatters/formatters.py
