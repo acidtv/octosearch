@@ -46,10 +46,10 @@ class Mountedcifs(localfs.Localfs):
         output = check_output(['getcifsacl', '-r', os.path.join(path, file)])
 
         acl = self.parse_cifsacl(output)
-        allowed = self.filter_acl_read(acl, self.ACE_ACCESS_ALLOWED)
-        denied = self.filter_acl_read(acl, self.ACE_ACCESS_DENIED)
+        allowed = self.acl_sids(self.filter_acl_read(acl, self.ACE_ACCESS_ALLOWED))
+        denied = self.acl_sids(self.filter_acl_read(acl, self.ACE_ACCESS_DENIED))
 
-        info = {'read_perms': }
+        info = {'read_allowed': allowed, 'read_denied': denied}
 
         return info
 
@@ -78,17 +78,6 @@ class Mountedcifs(localfs.Localfs):
             ace['access'] = int(permission_parts[0], 0)
             ace['mask'] = int(permission_parts[2], 0)
 
-            # check if access allowed
-            if ace['access'] != self.ACE_ACCESS_ALLOWED:
-                return
-
-            # check for read access
-            if (((ace['mask'] & self.ACE_TYPE_FULL_CONTROL) != self.ACE_TYPE_FULL_CONTROL)
-                    and ((ace['mask'] & self.ACE_TYPE_EREAD) != self.ACE_TYPE_EREAD)
-                    and ((ace['mask'] & self.ACE_TYPE_BREAD) != self.ACE_TYPE_BREAD)
-                    and ((ace['mask'] & self.ACE_TYPE_OREAD) != self.ACE_TYPE_OREAD)):
-                return
-
             return ace
 
     def filter_acl_read(self, acl, ace_access):
@@ -107,7 +96,7 @@ class Mountedcifs(localfs.Localfs):
             yield ace
 
     def acl_sids(self, acl):
-        return
+        return [ace['sid'] for ace in acl]
 
     def format_sid(raw_value):
         """
