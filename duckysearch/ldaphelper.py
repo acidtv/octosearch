@@ -24,13 +24,20 @@ class LDAPHelper:
         return info_results[1][0]
 
     def groups(self, group_dns):
-        # FIXME create graph of related groups
+        '''Make set of group_dns sid's, and of the groups the group_dns are a member of'''
         groups = []
 
         for group_dn in group_dns:
-            groups.append(self.entry(group_dn, ['objectSid', 'memberOf']))
+            group = self.entry(group_dn, ['objectSid', 'memberOf'])
 
-        return groups
+            # FIXME if `group` is not a security group continue?
+
+            groups.append(group)
+
+            if group['memberOf']:
+                groups.extend(self.groups(group['memberof']))
+
+        return set(groups)
 
     def entry(self, dn, attrlist=None):
         dn_result = self._conn.search(dn, ldap.SCOPE_BASE, '(objectclass=*)', attrlist=attrlist)
