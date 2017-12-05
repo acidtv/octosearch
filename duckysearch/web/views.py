@@ -28,3 +28,8 @@ def login():
         session['username'] = request.form['username']
 
     return render_template('login.html')
+
+
+@app.route('/search')
+def search():
+    return render_template('search.html')
