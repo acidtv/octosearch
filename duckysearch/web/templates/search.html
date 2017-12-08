@@ -2,5 +2,10 @@
 {% block content %}
 	<h2>Search</h2>
 
-	[insert search results here]
+    {% for result in results %}
+        <li>{{result.filename}}<span style="color: grey"> &mdash; {{result.path}}</span></li>
+        <!-- $.each(item.highlight.content, function(i, chunk) { -->
+        <!-- $('<span>' + _.escape(chunk) + ' ...</span>').appendTo('#results'); -->
+    {% endfor %}
 {% endblock %}
+

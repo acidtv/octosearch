@@ -23,9 +23,10 @@ class Ducky:
         # if args.check_removed:
             # indexer.check_removed()
 
+        elastic_output = elasticsearch.OutputElasticSearch(args.es_server, args.index)
+
         if args.index_dir:
             # indexer.directory(args.index_dir)
-            elastic_output = elasticsearch.OutputElasticSearch(args.es_server, args.index)
             cifs_indexer = mountedcifs.Mountedcifs(logger, elastic_output, parsers)
             cifs_indexer.directory(args.index_dir)
 
@@ -33,6 +34,7 @@ class Ducky:
             # backend.truncate()
 
         if args.webserver:
+            web.app.config['OUTPUT'] = elastic_output
             web.app.run(debug=True)
 
     def ignore_extensions(self):

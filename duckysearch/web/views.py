@@ -1,4 +1,4 @@
-from . import app, conf
+from . import app, conf, output
 from flask import render_template, request, session
 from .. import ldaphelper
 
@@ -32,4 +32,5 @@ def login():
 
 @app.route('/search')
 def search():
-    return render_template('search.html')
+    results = app.config['OUTPUT'].search(request.args['search'], session['groups'])
+    return render_template('search.html', results=results)
