@@ -23,6 +23,17 @@ An elastic search server can be started with docker:
 
  $ docker run docker.elastic.co/elasticsearch/elasticsearch:6.0.0
 
+Troubleshooting
+---------------
+
+In case you get a systemd error with docker about a cpu.shares file not found:
+
+ * https://stackoverflow.com/questions/32845917/docker-cannot-start-container-cpu-shares-no-such-file-or-directory#32878801
+
+Or an error about vm_map_max:
+
+ * https://github.com/docker-library/elasticsearch/issues/111
+
 LDAP Notes
 ----------
 
