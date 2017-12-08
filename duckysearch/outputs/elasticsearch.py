@@ -8,6 +8,9 @@ class OutputElasticSearch:
 
     index = None
 
+    # user groups to filter on
+    _user_groups = []
+
     def __init__(self, server, index):
         self.server = server
         self.index = index
@@ -18,7 +21,10 @@ class OutputElasticSearch:
 
         result = self._es_call('put', '/' + self.index + '/document/' + id, info)
 
-    def search(self, query_str, user_groups=[]):
+    def permissions(self, groups):
+        self._user_groups = groups
+
+    def search(self, query_str):
         query = {
                 'query': {
                     'bool': {
@@ -27,14 +33,25 @@ class OutputElasticSearch:
                                 'content': query_str
                                 },
                             },
-                        'filter': {
-                            'terms': {
-                                'read_allowed': user_groups
-                                }
-                            }
                         }
                     }
                 }
+
+        if self._user_groups:
+            query['query']['bool'].update({
+                'filter': {
+                    'must': {
+                        'terms': {
+                            'read_allowed': self._user_groups
+                            }
+                        },
+                    'must_not': {
+                        'terms': {
+                            'read_denied': self._user_groups
+                            }
+                        }
+                    }
+                })
 
         result = self._es_call('get', '/' + self.index + '/_search', query)
 
