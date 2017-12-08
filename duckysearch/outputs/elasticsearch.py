@@ -12,26 +12,41 @@ class OutputElasticSearch:
         self.server = server
         self.index = index
 
+
     def add(self, id, info):
         """Add new document to index"""
 
         result = self._es_call('put', '/' + self.index + '/document/' + id, info)
 
+    def search(self, query_str, user_groups=[]):
+        query = {
+                'query': {
+                    'bool': {
+                        'must': {
+                            'match': {
+                                'content': query_str
+                                },
+                            },
+                        'filter': {
+                            'terms': {
+                                'read_allowed': user_groups
+                                }
+                            }
+                        }
+                    }
+                }
+
+        result = self._es_call('get', '/' + self.index + '/_search', query)
+
+        for document in self._format_results(result):
+            yield document
+
     def get_all(self):
         '''Generator. Returns the entire index'''
 
-        result = self._es_call('get', '/' + self.index + '/document/_search?path:*', None)
-
-        pagesize = 100
-        pages = int(math.ceil(result['hits']['total']/(pagesize+.0)))
-
-        for page in range(pages):
-            pagefrom = (pagesize*page)
-            url = '/' + self.index + '/document/_search?path:*&fields=path,filename&from=' + str(pagefrom) + '&size=' + str(pagesize)
-            result = self._es_call('get', url, None)
-
-            for document in self._format_results(result):
-                yield document
+        result = self._es_call('get', '/' + self.index + '/_search', None)
+        for document in self._format_results(result):
+            yield document
 
     def get_keys(self, keys):
         '''Returns list with specified keys'''
@@ -66,14 +81,32 @@ class OutputElasticSearch:
         for document in results['hits']['hits']:
             dump = {
                     'id': document['_id'],
-                    'path': document['fields'].get('path'),
-                    'filename': document['fields'].get('filename'),
-                    'created': document['fields'].get('created'),
-                    'modified': document['fields'].get('modified'),
-                    'mimetype': document['fields'].get('mimetype')
+                    'path': document['_source'].get('path'),
+                    'filename': document['_source'].get('filename'),
+                    'created': document['_source'].get('created'),
+                    'modified': document['_source'].get('modified'),
+                    'mimetype': document['_source'].get('mimetype')
                     }
 
             yield dump
+
+    def _set_mapping(self, index):
+        mapping = {
+           'document': {
+               "properties": {
+                   "read_allowed": {
+                       "type": "keyword",
+                       "index": True,
+                       },
+                   "read_denied": {
+                       "type": "keyword",
+                       "index": True,
+                       },
+                   },
+               },
+           }
+
+        return self._es_call('PUT', '/' + self.index + '/_mapping/document', mapping)
 
     def _es_call(self, method, url, content=None):
         '''Call elastic search server'''
