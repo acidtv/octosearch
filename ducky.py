@@ -8,7 +8,7 @@ import argparse
 
 from duckysearch import web, parserplugins
 from duckysearch.indexers import mountedcifs
-from duckysearch.outputs import dummy
+from duckysearch.outputs import dummy, elasticsearch
 
 
 class Ducky:
@@ -25,7 +25,8 @@ class Ducky:
 
         if args.index_dir:
             # indexer.directory(args.index_dir)
-            cifs_indexer = mountedcifs.Mountedcifs(logger, dummy.Dummyoutput(), parsers)
+            elastic_output = elasticsearch.OutputElasticSearch(args.es_server, args.index)
+            cifs_indexer = mountedcifs.Mountedcifs(logger, elastic_output, parsers)
             cifs_indexer.directory(args.index_dir)
 
         # if args.truncate:
