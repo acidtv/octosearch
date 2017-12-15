@@ -9,7 +9,7 @@ class OutputElasticSearch:
     index = None
 
     # user groups to filter on
-    _user_groups = []
+    _user_groups = None
 
     def __init__(self, server, index):
         self.server = server
@@ -22,6 +22,9 @@ class OutputElasticSearch:
         result = self._es_call('put', '/' + self.index + '/document/' + id, info)
 
     def permissions(self, groups):
+        if not isinstance(groups, list):
+            raise Exception('groups param must be a list')
+
         self._user_groups = groups
 
     def search(self, query_str):
@@ -37,7 +40,7 @@ class OutputElasticSearch:
                     }
                 }
 
-        if self._user_groups:
+        if self._user_groups is not None:
             query['query']['bool'].update({
                 'filter': {
                     'must': {

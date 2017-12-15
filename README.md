@@ -32,7 +32,10 @@ In case you get a systemd error with docker about a cpu.shares file not found:
 
 Or an error about vm_map_max:
 
+ # sudo sysctl -w vm.max_map_count=262144
+
  * https://github.com/docker-library/elasticsearch/issues/111
+ 
 
 LDAP Notes
 ----------
