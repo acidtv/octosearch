@@ -19,7 +19,11 @@ class BackendElasticSearch:
     def add(self, id, info):
         """Add new document to index"""
 
-        result = self._es_call('put', '/' + self.index + '/document/' + id, info)
+        result = self._es_call('put', '/' + self.index + '/' + id, info)
+
+        if 'error' in result:
+            print result
+            raise Exception('elastic error')
 
     def permissions(self, groups):
         if not isinstance(groups, list):
@@ -110,23 +114,28 @@ class BackendElasticSearch:
 
             yield dump
 
-    def _set_mapping(self, index):
+    def _set_mapping(self):
         mapping = {
-           'document': {
-               "properties": {
-                   "read_allowed": {
-                       "type": "keyword",
-                       "index": True,
-                       },
-                   "read_denied": {
-                       "type": "keyword",
-                       "index": True,
-                       },
-                   },
-               },
+            "mappings": {
+                "document": {
+                    "properties": {
+                        "read_allowed": {
+                            "type": "keyword",
+                            "index": True,
+                            },
+                        "read_denied": {
+                            "type": "keyword",
+                            "index": True,
+                            },
+                        },
+                    }
+                }
            }
 
-        return self._es_call('PUT', '/' + self.index + '/_mapping/document', mapping)
+        result = self._es_call('PUT', '/' + self.index, mapping)
+
+        if 'error' in result:
+            raise Exception(result['error']['root_cause'][0]['reason'])
 
     def _es_call(self, method, url, content=None):
         '''Call elastic search server'''

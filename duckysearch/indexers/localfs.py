@@ -12,10 +12,13 @@ class Localfs(object):
     _ignore_mimetypes = []
     _ignore_extensions = []
 
-    def __init__(self, logger, output, plugins):
+    _sourcename = None
+
+    def __init__(self, logger, output, plugins, sourcename):
         self._logger = logger
         self._output = output
         self._plugins = plugins
+        self._sourcename = sourcename
         #self.init_parsers()
 
     def directory(self, root):
@@ -59,7 +62,7 @@ class Localfs(object):
 
     def index_file(self, path, file):
         id, info = self.process_file(path, file)
-        result = self._output.add(id, info)
+        self._output.add(id, info)
 
     def process_file(self, path, file):
         '''Index a file'''
@@ -103,6 +106,7 @@ class Localfs(object):
         info['modified'] = statdata.st_mtime
         info['content'] = content
         info['extra'] = extra
+        info['sourcename'] = self._sourcename
 
         id = hashlib.md5(file_full).hexdigest()
 
