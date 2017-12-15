@@ -1,5 +1,5 @@
 
-class Dummyoutput(object):
+class Dummybackend(object):
 
     def add(self, id, info):
         """Add new document to index"""

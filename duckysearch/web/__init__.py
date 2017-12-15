@@ -6,8 +6,5 @@ conf = config.Config()
 app.secret_key = conf.get('web', 'secret-key')
 
 
-output = None
-
-
 # not at top of file because `app` had to be initialized first
 from . import views

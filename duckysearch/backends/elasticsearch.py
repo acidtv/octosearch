@@ -2,7 +2,7 @@ import httplib
 import json
 import math
 
-class OutputElasticSearch:
+class BackendElasticSearch:
 
     server = None
 

@@ -1,6 +1,6 @@
 from . import app, conf
 from flask import render_template, request, session
-from .. import ldaphelper, outputs
+from .. import ldaphelper, backends
 
 
 @app.context_processor
@@ -32,14 +32,14 @@ def login():
 
 @app.route('/search')
 def search():
-    results = output().search(request.args['search'])
+    results = backend().search(request.args['search'])
     return render_template('search.html', results=results)
 
 
-def output():
-    output = outputs.elasticsearch.OutputElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))
+def backend():
+    backend = backends.elasticsearch.BackendElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))
 
     if 'groups' in session:
-        output.permissions(session['groups'])
+        backend.permissions(session['groups'])
 
-    return output
+    return backend

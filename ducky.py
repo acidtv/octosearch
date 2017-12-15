@@ -4,7 +4,7 @@ import argparse
 
 from duckysearch import web, parserplugins, config
 from duckysearch.indexers import mountedcifs
-from duckysearch.outputs import elasticsearch
+from duckysearch.backends import elasticsearch
 
 
 class Ducky:
@@ -20,8 +20,8 @@ class Ducky:
         #     indexer.check_removed()
 
         if args.index_dir:
-            elastic_output = elasticsearch.OutputElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))
-            cifs_indexer = mountedcifs.Mountedcifs(logger, elastic_output, parsers)
+            elastic_backend = elasticsearch.BackendElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))
+            cifs_indexer = mountedcifs.Mountedcifs(logger, elastic_backend, parsers)
             cifs_indexer.directory(args.index_dir)
 
         # if args.truncate:
