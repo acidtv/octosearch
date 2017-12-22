@@ -19,7 +19,13 @@ class BackendElasticSearch:
     def add(self, id, info):
         """Add new document to index"""
 
-        result = self._es_call('put', '/' + self.index + '/' + id, info)
+        document = {
+                'doc': info,
+                'doc_as_upsert': True,
+                }
+
+        # execute upsert
+        result = self._es_call('post', '/' + self.index + '/doc/' + id + '/_update', document)
 
         if 'error' in result:
             print result

@@ -54,7 +54,7 @@ class Localfs(object):
                 # compare modified date from index with filesystem
                 file = filestack.pop(document['id'])
                 if file['stat'].st_mtime > document['modified']:
-                    self.file(file['path'], file['file'])
+                    self.index_file(file['path'], file['file'])
 
             # new files
             for file in filestack:
