@@ -6,7 +6,7 @@ import hashlib
 
 class Localfs(object):
     _logger = None
-    _output = None
+    _backend = None
     _plugins = None
 
     _ignore_mimetypes = []
@@ -14,9 +14,9 @@ class Localfs(object):
 
     _sourcename = None
 
-    def __init__(self, logger, output, plugins, sourcename):
+    def __init__(self, logger, backend, plugins, sourcename):
         self._logger = logger
-        self._output = output
+        self._backend = backend
         self._plugins = plugins
         self._sourcename = sourcename
         #self.init_parsers()
@@ -48,7 +48,7 @@ class Localfs(object):
             if not filestack:
                 continue
 
-            documents = self._output.get_keys(filestack.keys())
+            documents = self._backend.get_keys(filestack.keys())
 
             for document in documents:
                 # compare modified date from index with filesystem
@@ -62,7 +62,7 @@ class Localfs(object):
 
     def index_file(self, path, file):
         id, info = self.process_file(path, file)
-        self._output.add(id, info)
+        self._backend.add(id, info)
 
     def process_file(self, path, file):
         '''Index a file'''
@@ -118,7 +118,7 @@ class Localfs(object):
         self._logger.add('Checking index for removed files...')
 
         removed = []
-        documents = self._output.get_all()
+        documents = self._backend.get_all()
 
         for document in documents:
             file_full = os.path.join(document['path'], document['filename'])
@@ -128,7 +128,7 @@ class Localfs(object):
 
         if removed:
             self._logger.add('Waiting for search engine to process removed files...')
-            self._output.remove(removed)
+            self._backend.remove(removed)
 
     def ignore_mimetypes(self, mimetypes):
         self._ignore_mimetypes = mimetypes
