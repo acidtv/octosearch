@@ -81,7 +81,7 @@ class BackendElasticSearch:
         '''Returns list with specified keys'''
 
         query = {
-                '_source': ['id.*', 'path.*', 'filename.*', 'created.*', 'modified.*', 'mimetype.*'],
+                '_source': ['id', 'path', 'filename', 'created', 'modified', 'mimetype'],
                 'query': {
                     'bool': {
                         'filter': [
