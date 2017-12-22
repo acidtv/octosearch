@@ -19,22 +19,24 @@ class Ducky:
         # if args.check_removed:
         #     indexer.check_removed()
 
-        # if args.truncate:
-            # backend.truncate()
-
-        if args.index:
-            elastic_backend = elasticsearch.BackendElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))
-            # elastic_backend._set_mapping()
-            cifs_indexer = mountedcifs.Mountedcifs(
-                    logger,
-                    elastic_backend,
-                    parsers,
-                    conf.get('indexer', 'name')
-                    )
-            cifs_indexer.directory(conf.get('indexer', 'path'))
-
         if args.webserver:
             web.app.run(debug=True)
+        else:
+            elastic_backend = elasticsearch.BackendElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))
+
+            if args.truncate:
+                elastic_backend.truncate()
+
+            if args.index:
+                # elastic_backend._set_mapping()
+                cifs_indexer = mountedcifs.Mountedcifs(
+                        logger,
+                        elastic_backend,
+                        parsers,
+                        conf.get('indexer', 'name')
+                        )
+                cifs_indexer.directory(conf.get('indexer', 'path'))
+
 
     def ignore_extensions(self):
         return ['swp', 'bin', 'rar', 'iso', 'img', 'zip']

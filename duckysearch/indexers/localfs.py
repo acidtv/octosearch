@@ -48,7 +48,7 @@ class Localfs(object):
             if not filestack:
                 continue
 
-            documents = self._backend.get_keys(filestack.keys())
+            documents = self._backend.get_keys(filestack.keys(), self._sourcename)
 
             for document in documents:
                 # compare modified date from index with filesystem

@@ -1,6 +1,6 @@
 import httplib
 import json
-import math
+
 
 class BackendElasticSearch:
 
@@ -11,10 +11,13 @@ class BackendElasticSearch:
     # user groups to filter on
     _user_groups = None
 
+    _last_error = None
+
+    _document_type = 'document'
+
     def __init__(self, server, index):
         self.server = server
         self.index = index
-
 
     def add(self, id, info):
         """Add new document to index"""
@@ -25,11 +28,7 @@ class BackendElasticSearch:
                 }
 
         # execute upsert
-        result = self._es_call('post', '/' + self.index + '/doc/' + id + '/_update', document)
-
-        if 'error' in result:
-            print result
-            raise Exception('elastic error')
+        self._es_call('post', '/' + self.index + '/' + self._document_type + '/' + id + '/_update', document)
 
     def permissions(self, groups):
         if not isinstance(groups, list):
@@ -78,16 +77,29 @@ class BackendElasticSearch:
         for document in self._format_results(result):
             yield document
 
-    def get_keys(self, keys):
+    def get_keys(self, keys, sourcename):
         '''Returns list with specified keys'''
 
         query = {
-                'size': 100000,
-                'fields': ['id', 'path', 'filename', 'created', 'modified', 'mimetype'],
-                'query': { 'ids': {'values': keys} }
+                '_source': ['id.*', 'path.*', 'filename.*', 'created.*', 'modified.*', 'mimetype.*'],
+                'query': {
+                    'bool': {
+                        'filter': [
+                            {'ids': {'type': self._document_type, 'values': keys}},
+                            {'term': {'sourcename': sourcename}}
+                            ]
+                        }
+                    }
                 }
 
-        result = self._es_call('get', '/' + self.index + '/document/_search', query)
+        try:
+            result = self._es_call('get', '/' + self.index + '/' + self._document_type + '/_search', query)
+        except ElasticRequestError as e:
+            # if index doesnt exist we get a 404
+            if self._last_error['status'] == 404:
+                return []
+
+            raise e
 
         return self._format_results(result)
 
@@ -95,12 +107,12 @@ class BackendElasticSearch:
         '''Remove files from index'''
 
         query = {'ids': {'values': files}}
-        self._es_call('delete', '/' + self.index + '/document/_query', query)
+        self._es_call('delete', '/' + self.index + '/' + self._document_type + '/_query', query)
 
     def truncate(self):
         '''Empty the entire index'''
 
-        self._es_call('delete', '/' + self.index + '/document')
+        self._es_call('delete', '/' + self.index)
 
     def _format_results(self, results):
         '''Generator. Normalize elastic search results'''
@@ -138,10 +150,7 @@ class BackendElasticSearch:
                 }
            }
 
-        result = self._es_call('PUT', '/' + self.index, mapping)
-
-        if 'error' in result:
-            raise Exception(result['error']['root_cause'][0]['reason'])
+        self._es_call('PUT', '/' + self.index, mapping)
 
     def _es_call(self, method, url, content=None):
         '''Call elastic search server'''
@@ -160,5 +169,18 @@ class BackendElasticSearch:
 
         httpcon.close()
 
+        if self._is_error(jsondoc):
+            self._last_error = jsondoc
+            raise ElasticRequestError(self._get_error_desc(jsondoc))
+
         return jsondoc
 
+    def _is_error(self, result):
+        return True if 'error' in result else False
+
+    def _get_error_desc(self, result):
+        return result['error']['root_cause'][0]['reason']
+
+
+class ElasticRequestError(Exception):
+    pass
