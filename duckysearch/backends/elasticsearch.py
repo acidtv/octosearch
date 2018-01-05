@@ -19,6 +19,19 @@ class BackendElasticSearch:
         self.server = server
         self.index = index
 
+        self.init_index(index)
+
+    def init_index(self, index):
+        '''Check if index exists, if not create it and set the field mapping'''
+
+        try:
+            self._es_call('get', '/' + index)
+        except ElasticRequestError as e:
+            if self._last_error['status'] != 404:
+                raise e
+
+            self._set_mapping()
+
     def add(self, id, info):
         """Add new document to index"""
 
@@ -133,7 +146,7 @@ class BackendElasticSearch:
     def _set_mapping(self):
         mapping = {
             "mappings": {
-                "document": {
+                self._document_type: {
                     "properties": {
                         "read_allowed": {
                             "type": "keyword",
