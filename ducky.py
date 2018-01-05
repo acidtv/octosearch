@@ -10,33 +10,29 @@ from duckysearch.backends import elasticsearch
 class Ducky:
     def start(self, args):
         logger = Logger()
-        parsers = parserplugins.ParserPlugins()
         conf = config.Config()
-
-        # main_indexer = indexer.Indexer(['conf-placeholder'])
-        # indexer.ignore_extensions(self.ignore_extensions)
-
-        # if args.check_removed:
-        #     indexer.check_removed()
 
         if args.webserver:
             web.app.run(debug=True)
         else:
             elastic_backend = elasticsearch.BackendElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))
 
+            # if args.check_removed:
+            #     indexer.check_removed()
+
             if args.truncate:
                 elastic_backend.truncate()
 
             if args.index:
-                # elastic_backend._set_mapping()
+                parsers = parserplugins.ParserPlugins()
                 cifs_indexer = mountedcifs.Mountedcifs(
                         logger,
                         elastic_backend,
                         parsers,
                         conf.get('indexer', 'name')
                         )
+                # indexer.ignore_extensions(self.ignore_extensions)
                 cifs_indexer.directory(conf.get('indexer', 'path'))
-
 
     def ignore_extensions(self):
         return ['swp', 'bin', 'rar', 'iso', 'img', 'zip']
