@@ -31,11 +31,17 @@ After that:
 Troubleshooting
 ---------------
 
-In case you get a systemd error with docker about a cpu.shares file not found:
+### The search doesn't work 
+
+This project is still in the early stages of it's development, so the elasticsearch field mappings change from time to time. Try truncating and re-indexing.
+
+    $ pipenv run ./ducky.py --truncate && pipenv run ./ducky.py --index
+
+### In case you get a systemd error with docker about a cpu.shares file not found
 
  * https://stackoverflow.com/questions/32845917/docker-cannot-start-container-cpu-shares-no-such-file-or-directory#32878801
 
-Or an error about vm_map_max:
+### An error about vm_map_max
 
     $ sudo sysctl -w vm.max_map_count=262144
 
