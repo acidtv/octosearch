@@ -52,15 +52,13 @@ class BackendElasticSearch:
         if self._user_groups is not None:
             query['query']['bool'].update({
                 'filter': {
-                    'must': {
-                        'terms': {
-                            'read_allowed': self._user_groups
-                            }
-                        },
-                    'must_not': {
-                        'terms': {
-                            'read_denied': self._user_groups
-                            }
+                    'terms': {
+                        'read_allowed': self._user_groups
+                    }
+                },
+                'must_not': {
+                    'terms': {
+                        'read_denied': self._user_groups
                         }
                     }
                 })
