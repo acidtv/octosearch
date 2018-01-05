@@ -1,8 +1,7 @@
 {% extends "template.html" %}
 {% block content %}
 	<form id="duckysearch" method="GET" action="/search">
-		<label>Search</label><input name="search" id="search" value="" /><br />
-		<label>Index</label><input name="index" id="index" value="ducky" /><br />
+		<label>Search</label><input name="q" id="search" value="" /><br />
 		<input type="submit" value="Search" />
 	</form>
 {% endblock %}
