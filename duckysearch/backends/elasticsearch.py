@@ -51,6 +51,11 @@ class BackendElasticSearch:
 
     def search(self, query_str):
         query = {
+                'highlight': {
+                    'fields': {
+                        'content': {}
+                        }
+                    },
                 'query': {
                     'bool': {
                         'must': {
@@ -138,7 +143,8 @@ class BackendElasticSearch:
                     'filename': document['_source'].get('filename'),
                     'created': document['_source'].get('created'),
                     'modified': document['_source'].get('modified'),
-                    'mimetype': document['_source'].get('mimetype')
+                    'mimetype': document['_source'].get('mimetype'),
+                    'highlight': document['highlight'].get('content')
                     }
 
             yield dump

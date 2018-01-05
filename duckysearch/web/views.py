@@ -33,7 +33,7 @@ def login():
 @app.route('/search')
 def search():
     results = backend().search(request.args['q'])
-    return render_template('search.html', results=results)
+    return render_template('search.html', results=results, query=request.args['q'])
 
 
 def backend():

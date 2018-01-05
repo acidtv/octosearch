@@ -1,7 +1,4 @@
 {% extends "template.html" %}
 {% block content %}
-	<form id="duckysearch" method="GET" action="/search">
-		<label>Search</label><input name="q" id="search" value="" /><br />
-		<input type="submit" value="Search" />
-	</form>
+    {% include 'snippets/search-bar.html' %}
 {% endblock %}

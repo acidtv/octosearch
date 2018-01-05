@@ -6,10 +6,6 @@ em {
 	background-color: yellow;
 }
 
-li {
-	font-weight: bold;
-}
-
 label {
 	width: 100px;
 	display: block;
@@ -18,5 +14,22 @@ label {
 
 .menu {
 	float: right;
+}
+
+.search_results .item {
+    max-width: 1000px;
+}
+
+.search_results .item {
+    float: left;
+    clear: left;
+    margin-bottom: 20px;
+}
+
+.search_results .item .highlight {
+    font-size: .9em;
+    color: #666;
+    float: left;
+    clear: left;
 }
 
