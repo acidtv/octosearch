@@ -148,6 +148,9 @@ class BackendElasticSearch:
             "mappings": {
                 self._document_type: {
                     "properties": {
+                        "content": {
+                            "type": "text",
+                            },
                         "read_allowed": {
                             "type": "keyword",
                             "index": True,
@@ -156,7 +159,43 @@ class BackendElasticSearch:
                             "type": "keyword",
                             "index": True,
                             },
-                        },
+                        "sourcename": {
+                            "type": "keyword",
+                            "index": True,
+                            },
+                        "created": {
+                            "type": "date",
+                            },
+                        "modified": {
+                            "type": "date",
+                            },
+
+                        # text / keyword fields for search flexibility
+                        "filename": {
+                            "type": "text",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword",
+                                    }
+                                }
+                            },
+                        "mimetype": {
+                            "type": "text",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword",
+                                    }
+                                }
+                            },
+                        "path": {
+                            "type": "text",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword",
+                                    }
+                                }
+                            },
+                        }
                     }
                 }
            }
