@@ -13,5 +13,8 @@ class Config:
     def parse(self, config):
         return config
 
-    def get(self, section, option):
-        return self._config.get(section, option)
+    def get(self, section, option=None):
+        if option is None:
+            return dict(self._config.items(section))
+        else:
+            return self._config.get(section, option)

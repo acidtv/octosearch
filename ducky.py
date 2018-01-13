@@ -2,14 +2,13 @@
 
 import argparse
 
-from duckysearch import web, parserplugins, config
-from duckysearch.indexers import mountedcifs
+from duckysearch import web, config, indexer
+from duckysearch import parserplugins
 from duckysearch.backends import elasticsearch
 
 
 class Ducky:
     def start(self, args):
-        logger = Logger()
         conf = config.Config()
 
         if args.webserver:
@@ -17,6 +16,7 @@ class Ducky:
         else:
             elastic_backend = elasticsearch.BackendElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))
 
+            # FIXME
             # if args.check_removed:
             #     indexer.check_removed()
 
@@ -24,15 +24,22 @@ class Ducky:
                 elastic_backend.truncate()
 
             if args.index:
-                parsers = parserplugins.ParserPlugins()
-                cifs_indexer = mountedcifs.Mountedcifs(
-                        logger,
-                        elastic_backend,
-                        parsers,
-                        conf.get('indexer', 'name')
-                        )
+                index_job = indexer.Indexer()
+                index_job.logger = Logger()
+                index_job.ignore_extensions = self.ignore_extensions()
+                index_job.backend = elastic_backend
+                index_job.parsers = parserplugins.ParserPlugins()
+                index_job.index(conf.get('indexer'))
+
+                # parsers = parserplugins.ParserPlugins()
+                # cifs_indexer = mountedcifs.Mountedcifs(
+                        # logger,
+                        # elastic_backend,
+                        # parsers,
+                        # conf.get('indexer', 'name')
+                        # )
                 # indexer.ignore_extensions(self.ignore_extensions)
-                cifs_indexer.directory(conf.get('indexer', 'path'))
+                # cifs_indexer.directory(conf.get('indexer', 'path'))
 
     def ignore_extensions(self):
         return ['swp', 'bin', 'rar', 'iso', 'img', 'zip']

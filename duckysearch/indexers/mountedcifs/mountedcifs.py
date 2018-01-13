@@ -1,7 +1,6 @@
 from subprocess import check_output
 import os.path
-from . import localfs
-from .. import ldaphelper
+from ..localfs import localfs
 
 
 class Mountedcifs(localfs.Localfs):
@@ -38,10 +37,10 @@ class Mountedcifs(localfs.Localfs):
     ACE_TYPE_ALL_WRITE_BITS = 0x40000116
 
     def process_file(self, path, file):
-        id, info = super(Mountedcifs, self).process_file(path, file)
-        info.update(self.cifs_info(path, file))
+        metadata = super(Mountedcifs, self).process_file(path, file)
+        metadata.update(self.cifs_info(path, file))
 
-        return id, info
+        return metadata
 
     def cifs_info(self, path, file):
         output = check_output(['getcifsacl', '-r', os.path.join(path, file)])

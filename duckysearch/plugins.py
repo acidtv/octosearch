@@ -1,4 +1,16 @@
 import os
+import pkg_resources
+
+
+def get(type, plugin):
+    dist, name = plugin.split(':')
+
+    try:
+        return pkg_resources.load_entry_point(dist=dist, group='duckysearch.' + type, name=name)
+    except Exception as e:
+        # FIXME
+        raise e
+
 
 class Plugins:
 	def load(self, plugin):

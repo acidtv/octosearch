@@ -4,3 +4,4 @@ testfiles/*
 TODO*
 .vimproject
 config.ini
+*.egg-info
