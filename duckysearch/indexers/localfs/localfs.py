@@ -41,6 +41,7 @@ class Localfs(object):
         metadata['mimetype'] = mimetype
         metadata['created'] = statdata.st_ctime
         metadata['modified'] = statdata.st_mtime
+        metadata['size'] = statdata.st_size
 
         return metadata
 

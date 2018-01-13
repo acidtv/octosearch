@@ -1,52 +1,66 @@
 import re
 
+
 class ParserFallback:
-	def types(self):
-		return {'mimetypes': [None]}
+    _pattern = '[a-z]'
 
-	def parse(self, file, statdata):
-		megabyte = 1024*1024
+    def types(self):
+        return {'mimetypes': [None]}
 
-		# safety guard, so insanely big blobs won't get indexed
-		if statdata.st_size > (megabyte*10):
-			return ''
+    def find_words(self, content):
+        # match all strings that look like words from 2 to 10 characters long
+        return re.findall(self._pattern + '{2,10}', content, re.IGNORECASE)
 
-		f = open(file)
-		
-		content = '1'
-		lastword = ''
+    def parse_content(self, content, metadata):
+        return self.compact(self.find_words(content))
 
-		pattern = '[a-z]'
+    def parse_stream(self, file, metadata):
+        megabyte = 1024*1024
 
-		parsed = ''
-		i = 0
+        # safety guard, so insanely big blobs won't get indexed
+        if metadata['size'] > (megabyte*10):
+            return ''
 
-		while content:
-			i = i + 1
-			content = f.read(1024)
+        f = open(file)
 
-			if content.strip() == '':
-				continue
+        content = '1'
+        lastword = ''
 
-			# test if first character is a word character
-			if lastword and re.match(pattern, content[0], re.IGNORECASE):
-				content = lastword + content
+        parsed = ''
+        i = 0
 
-			# match all strings that look like words from 2 to 10 characters long
-			result = re.findall(pattern + '{2,10}', content, re.IGNORECASE)
+        while content:
+            i = i + 1
+            content = f.read(1024)
 
-			lastword = ''
-			until = None
-			# test if last character is a word character
-			if result and re.match(pattern, content[-1], re.IGNORECASE) != None:
-				lastword = result[-1]
-				until = -1
+            if content.strip() == '':
+                continue
 
-			for word in result[:until]:
-				parsed += ' ' + word.lower()
+            # test if first character is a word character
+            if lastword and re.match(self._pattern, content[0], re.IGNORECASE):
+                content = lastword + content
 
-		return parsed
+            result = self.find_words(content)
 
-	def extra(self):
-		return {}
-				
+            lastword = ''
+            until = None
+
+            # test if last character is a word character
+            if result and re.match(self._pattern, content[-1], re.IGNORECASE) is not None:
+                lastword = result[-1]
+                until = -1
+
+            parsed = self.compact(result[:until])
+
+        return parsed
+
+    def compact(self, regex_result):
+        parsed = ''
+
+        for word in regex_result:
+            parsed += ' ' + word.lower()
+
+        return parsed
+
+    def extra(self):
+        return {}

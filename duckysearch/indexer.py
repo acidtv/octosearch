@@ -72,9 +72,9 @@ class Indexer(object):
         return document
 
     def parse_content(self, content, metadata):
-        parser = self._plugins.get(metadata['mimetype'], metadata['extension'])
+        parser = self.parsers.get(metadata['mimetype'], metadata['extension'])
 
-        content = parser.parse(content, metadata)
+        content = parser.parse_content(content, metadata)
 
         if not isinstance(content, str):
             raise Exception('Parser must return string')
