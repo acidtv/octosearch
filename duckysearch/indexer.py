@@ -19,15 +19,12 @@ class Indexer(object):
     def index(self, conf):
         indexer = plugins.get('indexer', conf['indexer'])()
 
-        for metadata in indexer.index(conf):
+        for file in indexer.index(conf):
+            metadata = file.metadata()
             id = self.file_id(metadata)
             if not self.ignore_file(id, metadata, conf['name']):
                 self.logger.add(metadata['url'] + ' (' + str(metadata['mimetype']) + ')')
-                document = self.prepare_document(
-                    metadata,
-                    self.get_file_content(indexer, metadata),
-                    conf['name']
-                )
+                document = self.prepare_document(file, conf['name'])
                 self.backend.add(id, document)
 
     def ignore_file(self, id, metadata, sourcename):
@@ -57,24 +54,22 @@ class Indexer(object):
     def file_id(self, metadata):
         return hashlib.md5(metadata['url']).hexdigest()
 
-    def prepare_document(self, metadata, content, sourcename):
-        parsed_content, filetype_metadata = self.parse_content(
-            content,
-            metadata,
-        )
+    def prepare_document(self, file, sourcename):
+        parsed_content, filetype_metadata = self.parse_content(file)
 
         # prepare for adding to backend
-        document = metadata
+        document = file.metadata()
         document['sourcename'] = sourcename
         document['content'] = parsed_content
         document['filetype_metadata'] = filetype_metadata
 
         return document
 
-    def parse_content(self, content, metadata):
+    def parse_content(self, file):
+        metadata = file.metadata()
         parser = self.parsers.get(metadata['mimetype'], metadata['extension'])
 
-        content = parser.parse_content(content, metadata)
+        content = parser.parse_content(file)
 
         if not isinstance(content, str):
             raise Exception('Parser must return string')
@@ -86,3 +81,48 @@ class Indexer(object):
             raise Exception('Extra info from parser must be dict')
 
         return content, filetype_metadata
+
+class File(obj):
+
+    _encoding = None
+
+    _metadata = {}
+
+    def __init__(self, metadata, encoding=None):
+        self._metadata = metadata
+        self._encoding = encoding
+
+    def encoding(self):
+        # FIXME if no encoding is set try to detect the file encoding
+        return self._encoding
+
+    def metadata(self):
+        return self._metadata
+
+class LocalFile(File):
+    _path = None
+
+    def __init__(self, path, metadata, encoding=None):
+        self._path = path
+        super(LocalFile, self).__init__(encoding, metadata)
+
+    def open_binary():
+        return open(self._path, mode='rb')
+
+    def open_text():
+        return open(self._path, mode='rt', encoding=self._encoding)
+
+class MemoryFile(File):
+
+    _contents = ''
+
+    def __init__(self, contents, metadata, encoding=None):
+        self._contents = contents
+        super(MemoryFile, self).__init__(encoding, metadata)
+
+    def open_binary():
+        return BytesIO(self._contents)
+
+    def open_text():
+        return StringIO(self._contents)
+

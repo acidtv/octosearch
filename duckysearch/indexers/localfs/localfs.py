@@ -2,6 +2,7 @@ import os
 import os.path
 import mimetypes
 
+from ..indexer import LocalFile
 
 class Localfs(object):
 
@@ -43,7 +44,7 @@ class Localfs(object):
         metadata['modified'] = statdata.st_mtime
         metadata['size'] = statdata.st_size
 
-        return metadata
+        return LocalFile(file_full, metadata)
 
     def get_file_content(self, metadata):
         file_full = os.path.join(metadata['path'], metadata['filename'])

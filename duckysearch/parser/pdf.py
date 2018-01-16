@@ -9,17 +9,18 @@ class ParserPdf:
 			'mimetypes': ['application/pdf']
 		}
 
-	def parse(self, file_full, statdata):
-		pdf = PdfFileReader(file(file_full, 'rb'))
+	def parse(self, file):
+                with file.open_binary() as f:
+                    pdf = PdfFileReader(f)
 
-		pages = pdf.getNumPages()
-		text = ''
+                    pages = pdf.getNumPages()
+                    text = ''
 
-		self._extra['pages'] = pages
+                    self._extra['pages'] = pages
 
-		for pagenr in range(pages):
-			page = pdf.getPage(pagenr-1)
-			text += ' ' + page.extractText()
+                    for pagenr in range(pages):
+                            page = pdf.getPage(pagenr-1)
+                            text += ' ' + page.extractText()
 
 		return text
 

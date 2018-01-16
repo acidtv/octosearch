@@ -14,14 +14,13 @@ class ParserFallback:
     def parse_content(self, content, metadata):
         return self.compact(self.find_words(content))
 
-    def parse_stream(self, file, metadata):
+    def parse_stream(self, file):
         megabyte = 1024*1024
+        metadata = file.metadata()
 
         # safety guard, so insanely big blobs won't get indexed
         if metadata['size'] > (megabyte*10):
             return ''
-
-        f = open(file)
 
         content = '1'
         lastword = ''
@@ -29,28 +28,29 @@ class ParserFallback:
         parsed = ''
         i = 0
 
-        while content:
-            i = i + 1
-            content = f.read(1024)
+        with file.open_binary() as f
+            while content:
+                i = i + 1
+                content = f.read(1024)
 
-            if content.strip() == '':
-                continue
+                if content.strip() == '':
+                    continue
 
-            # test if first character is a word character
-            if lastword and re.match(self._pattern, content[0], re.IGNORECASE):
-                content = lastword + content
+                # test if first character is a word character
+                if lastword and re.match(self._pattern, content[0], re.IGNORECASE):
+                    content = lastword + content
 
-            result = self.find_words(content)
+                result = self.find_words(content)
 
-            lastword = ''
-            until = None
+                lastword = ''
+                until = None
 
-            # test if last character is a word character
-            if result and re.match(self._pattern, content[-1], re.IGNORECASE) is not None:
-                lastword = result[-1]
-                until = -1
+                # test if last character is a word character
+                if result and re.match(self._pattern, content[-1], re.IGNORECASE) is not None:
+                    lastword = result[-1]
+                    until = -1
 
-            parsed = self.compact(result[:until])
+                parsed += self.compact(result[:until])
 
         return parsed
 
