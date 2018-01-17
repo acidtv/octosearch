@@ -133,7 +133,7 @@ class BackendElasticSearch:
     def _format_results(self, results):
         '''Generator. Normalize elastic search results'''
 
-        if not 'hits' in results:
+        if 'hits' not in results:
             return
 
         for document in results['hits']['hits']:
@@ -144,8 +144,11 @@ class BackendElasticSearch:
                     'created': document['_source'].get('created'),
                     'modified': document['_source'].get('modified'),
                     'mimetype': document['_source'].get('mimetype'),
-                    'highlight': document['highlight'].get('content')
                     }
+
+            # not all results have highlights
+            if 'highlight' in document:
+                dump['highlight'] = document['highlight'].get('content')
 
             yield dump
 

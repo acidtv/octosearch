@@ -70,7 +70,7 @@ class Indexer(object):
         metadata = file.metadata()
         parser = self.parsers.get(metadata['mimetype'], metadata['extension'])
 
-        content = parser.parse_content(file)
+        content = parser.parse(file)
 
         if not isinstance(content, str):
             raise Exception('Parser must return string')

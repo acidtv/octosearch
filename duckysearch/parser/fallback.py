@@ -11,10 +11,7 @@ class ParserFallback:
         # match all strings that look like words from 2 to 10 characters long
         return re.findall(self._pattern + '{2,10}', content, re.IGNORECASE)
 
-    def parse_content(self, content, metadata):
-        return self.compact(self.find_words(content))
-
-    def parse_stream(self, file):
+    def parse(self, file):
         megabyte = 1024*1024
         metadata = file.metadata()
 
