@@ -1,5 +1,6 @@
 import plugins
 import hashlib
+from io import BytesIO, StringIO
 
 
 class Indexer(object):
@@ -82,7 +83,8 @@ class Indexer(object):
 
         return content, filetype_metadata
 
-class File(obj):
+
+class File(object):
 
     _encoding = None
 
@@ -99,18 +101,20 @@ class File(obj):
     def metadata(self):
         return self._metadata
 
+
 class LocalFile(File):
     _path = None
 
     def __init__(self, path, metadata, encoding=None):
         self._path = path
-        super(LocalFile, self).__init__(encoding, metadata)
+        super(LocalFile, self).__init__(metadata, encoding)
 
-    def open_binary():
+    def open_binary(self):
         return open(self._path, mode='rb')
 
-    def open_text():
+    def open_text(self):
         return open(self._path, mode='rt', encoding=self._encoding)
+
 
 class MemoryFile(File):
 
@@ -118,11 +122,10 @@ class MemoryFile(File):
 
     def __init__(self, contents, metadata, encoding=None):
         self._contents = contents
-        super(MemoryFile, self).__init__(encoding, metadata)
+        super(MemoryFile, self).__init__(metadata, encoding)
 
-    def open_binary():
+    def open_binary(self):
         return BytesIO(self._contents)
 
-    def open_text():
+    def open_text(self):
         return StringIO(self._contents)
-

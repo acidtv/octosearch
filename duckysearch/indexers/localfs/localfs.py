@@ -2,7 +2,8 @@ import os
 import os.path
 import mimetypes
 
-from ..indexer import LocalFile
+from ...indexer import LocalFile
+
 
 class Localfs(object):
 
@@ -23,7 +24,7 @@ class Localfs(object):
                     dirstack.append(full_path)
                     continue
 
-                yield self.process_file(path, file)
+                yield LocalFile(full_path, self.process_file(path, file))
 
     def process_file(self, path, file):
         '''Index a file'''
@@ -44,7 +45,7 @@ class Localfs(object):
         metadata['modified'] = statdata.st_mtime
         metadata['size'] = statdata.st_size
 
-        return LocalFile(file_full, metadata)
+        return metadata
 
     def get_file_content(self, metadata):
         file_full = os.path.join(metadata['path'], metadata['filename'])

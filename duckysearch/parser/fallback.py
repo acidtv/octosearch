@@ -28,7 +28,7 @@ class ParserFallback:
         parsed = ''
         i = 0
 
-        with file.open_binary() as f
+        with file.open_binary() as f:
             while content:
                 i = i + 1
                 content = f.read(1024)
