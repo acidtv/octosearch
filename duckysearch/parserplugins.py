@@ -12,7 +12,7 @@ class ParserPlugins(plugins.Plugins):
 	_type = 'parser'
 
 	def __init__(self):
-		"""Load parsers to see which mimetypes they want 
+		"""Load parsers to see which mimetypes they want
 		to take care of"""
 
 		for plugin in self.list_plugins():
@@ -22,7 +22,7 @@ class ParserPlugins(plugins.Plugins):
 			# map types to this parser
 			for key in types.keys():
 				for type_ in types[key]:
-					self._parsers[key][type_] = obj			
+					self._parsers[key][type_] = obj
 
 	def get(self, mimetype, extension):
 		'''Returns a suitable parser plugin for the given mimetype and extension'''
@@ -33,7 +33,7 @@ class ParserPlugins(plugins.Plugins):
 
 		if mimetype:
 			# look for direct mimetype match
-			if mimetype in self._parsers:
+			if mimetype in self._parsers['mimetypes']:
 				return self._parsers['mimetypes'][mimetype]
 
 			# try to see if mimetypes matches any of the regexps

@@ -72,7 +72,7 @@ class Indexer(object):
 
         content = parser.parse(file)
 
-        if not isinstance(content, str):
+        if not isinstance(content, str) and not isinstance(content, unicode):
             raise Exception('Parser must return string')
 
         # get metadata based on filetype, like image dimensions or compression ratio
