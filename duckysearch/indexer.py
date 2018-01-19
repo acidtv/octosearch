@@ -67,6 +67,8 @@ class Indexer(object):
         document['content'] = parsed_content
         document['filetype_metadata'] = filetype_metadata
 
+        document['auth'] = ''
+
         if 'auth' in conf:
             document['auth'] = conf['auth']
 
