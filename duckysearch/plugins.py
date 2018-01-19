@@ -12,6 +12,10 @@ def get(type, plugin):
         raise e
 
 
+def list(type):
+    return pkg_resources.iter_entry_points(group='duckysearch.' + type)
+
+
 class Plugins:
 	def load(self, plugin):
 		'''Return a reference to requested class, not an instance'''

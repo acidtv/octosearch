@@ -7,6 +7,10 @@ setup(
             'duckysearch.indexer': [
                 'localfs = duckysearch.indexers.localfs.localfs:Localfs',
                 'mountedcifs = duckysearch.indexers.mountedcifs.mountedcifs:Mountedcifs',
+                ],
+            'duckysearch.parser': [
+                'application/pdf = duckysearch.parser.pdf:ParserPdf',
+                'text/* = duckysearch.parser.text:ParserText',
                 ]
             }
         )
