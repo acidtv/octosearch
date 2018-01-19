@@ -2,8 +2,7 @@
 
 import argparse
 
-from duckysearch import web, config, indexer
-from duckysearch import parserplugins
+from duckysearch import web, config, indexer, parserplugins, logger
 from duckysearch.backends import elasticsearch
 
 
@@ -25,29 +24,10 @@ class Ducky:
 
             if args.index:
                 index_job = indexer.Indexer()
-                index_job.logger = Logger()
-                index_job.ignore_extensions = self.ignore_extensions()
+                index_job.logger = logger.Logger()
                 index_job.backend = elastic_backend
                 index_job.parsers = parserplugins.ParserPlugins()
                 index_job.index(conf.get('indexer'))
-
-                # parsers = parserplugins.ParserPlugins()
-                # cifs_indexer = mountedcifs.Mountedcifs(
-                        # logger,
-                        # elastic_backend,
-                        # parsers,
-                        # conf.get('indexer', 'name')
-                        # )
-                # indexer.ignore_extensions(self.ignore_extensions)
-                # cifs_indexer.directory(conf.get('indexer', 'path'))
-
-    def ignore_extensions(self):
-        return ['swp', 'bin', 'rar', 'iso', 'img', 'zip']
-
-
-class Logger:
-    def add(self, text):
-        print text
 
 
 if __name__ == '__main__':

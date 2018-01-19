@@ -8,8 +8,6 @@ class ParserPlugins(object):
             'extensions': {}
             }
 
-    _type = 'parser'
-
     def __init__(self):
         """Load parsers to see which mimetypes they want
             to take care of"""
