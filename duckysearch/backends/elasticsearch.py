@@ -10,6 +10,7 @@ class BackendElasticSearch:
 
     # user groups to filter on
     _user_groups = None
+    _user_auth = None
 
     _last_error = None
 
@@ -68,7 +69,13 @@ class BackendElasticSearch:
                     }
                 }
 
-        if self._user_auth is not None:
+        if not self._user_auth:
+            query['query']['bool'].update({
+                'filter': [
+                    {'term': {'auth': ''}}
+                    ]
+                })
+        elif self._user_auth is not None:
             query['query']['bool'].update({
                 'filter': [
                     {'term': {'auth': self._user_auth}}
