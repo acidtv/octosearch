@@ -19,7 +19,9 @@ class Indexer(object):
 
     def index(self, conf):
         indexer = plugins.get('indexer', conf['indexer'])()
-        self.ignore_extensions = conf['ignore-extensions']
+
+        if 'ignore-extensions' in conf:
+            self.ignore_extensions = conf['ignore-extensions']
 
         for file in indexer.index(conf):
             metadata = file.metadata()
