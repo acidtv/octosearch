@@ -43,13 +43,14 @@ class BackendElasticSearch:
         # execute upsert
         self._es_call('post', '/' + self.index + '/' + self._document_type + '/' + id + '/_update', document)
 
-    def permissions(self, groups):
+    def auth(self, auth, groups):
         if not isinstance(groups, list):
             raise Exception('groups param must be a list')
 
+        self._user_auth = auth
         self._user_groups = groups
 
-    def search(self, query_str):
+    def search(self, query_str, auth=None):
         query = {
                 'highlight': {
                     'fields': {
@@ -67,20 +68,28 @@ class BackendElasticSearch:
                     }
                 }
 
-        if self._user_groups is not None:
+        if self._user_auth is not None:
             query['query']['bool'].update({
-                'filter': {
-                    'terms': {
-                        'read_allowed': self._user_groups
-                    }
-                },
-                'must_not': {
-                    'terms': {
-                        'read_denied': self._user_groups
-                        }
-                    }
+                'filter': [
+                    {'term': {'auth': self._user_auth}}
+                    ]
                 })
 
+            if self._user_groups is not None:
+                query['query']['bool']['filter'].append({
+                        'terms': {
+                            'read_allowed': self._user_groups
+                        }
+                    })
+                query['query']['bool'].update({
+                    'must_not': {
+                        'terms': {
+                            'read_denied': self._user_groups
+                            }
+                        }
+                    })
+
+        print query
         result = self._es_call('get', '/' + self.index + '/_search', query)
 
         for document in self._format_results(result):
@@ -169,6 +178,10 @@ class BackendElasticSearch:
                             "index": True,
                             },
                         "sourcename": {
+                            "type": "keyword",
+                            "index": True,
+                            },
+                        "auth": {
                             "type": "keyword",
                             "index": True,
                             },

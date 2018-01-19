@@ -26,7 +26,7 @@ class Indexer(object):
             id = self.file_id(metadata)
             if not self.ignore_file(id, metadata, conf['name']):
                 self.logger.add(metadata['url'] + ' (' + str(metadata['mimetype']) + ')')
-                document = self.prepare_document(file, conf['name'])
+                document = self.prepare_document(file, conf)
                 self.backend.add(id, document)
 
     def ignore_file(self, id, metadata, sourcename):
@@ -56,14 +56,17 @@ class Indexer(object):
     def file_id(self, metadata):
         return hashlib.md5(metadata['url']).hexdigest()
 
-    def prepare_document(self, file, sourcename):
+    def prepare_document(self, file, conf):
         parsed_content, filetype_metadata = self.parse_content(file)
 
         # prepare for adding to backend
         document = file.metadata()
-        document['sourcename'] = sourcename
+        document['sourcename'] = conf['name']
         document['content'] = parsed_content
         document['filetype_metadata'] = filetype_metadata
+
+        if 'auth' in conf:
+            document['auth'] = conf['auth']
 
         return document
 

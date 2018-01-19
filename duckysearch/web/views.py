@@ -27,15 +27,15 @@ def login():
 
 @app.route('/search')
 def search():
-    results = backend().search(request.args['q'])
+    results = backend().search(request.args['q'], session['auth'])
     return render_template('search.html', results=results, query=request.args['q'])
 
 
 def backend():
     backend = backends.elasticsearch.BackendElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))
 
-    if 'groups' in session:
-        backend.permissions(session['groups'])
+    if 'auth' in session:
+        backend.auth(session['auth'], session['groups'])
 
     return backend
 
@@ -46,6 +46,7 @@ def auth():
     if not auth_driver.authenticate(request.form['username'], request.form['password']):
         return False
 
+    session['auth'] = conf.get('auth', 'name')
     session['groups'] = auth_driver.groups()
     session['username'] = request.form['username']
 
