@@ -2,6 +2,12 @@
 {% block content %}
 	<h2>Login</h2>
 
+    {% if success == True %}
+        <p class="success">Login successful</p>
+    {% elif success == False %}
+        <p class="error">Login failed</p>
+    {% endif %}
+
 	<form method="post">
 		<label>Username</label><input name="username" value="" /><br />
 		<label>Password</label><input name="password" type="password" /><br />

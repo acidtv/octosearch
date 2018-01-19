@@ -11,6 +11,9 @@ setup(
             'duckysearch.parser': [
                 'application/pdf = duckysearch.parser.pdf:ParserPdf',
                 'text/* = duckysearch.parser.text:ParserText',
+                ],
+            'duckysearch.auth': [
+                'ldap = duckysearch.auth.ldaphelper:LDAPAuth',
                 ]
             }
         )

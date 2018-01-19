@@ -1,6 +1,6 @@
 from . import app, conf
 from flask import render_template, request, session
-from .. import ldaphelper, backends
+from .. import backends, plugins
 
 
 @app.context_processor
@@ -18,16 +18,11 @@ def index():
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+    success = None
     if request.method == 'POST':
-        ldap = ldaphelper.LDAPHelper(conf.get('ldap', 'server'), conf.get('ldap', 'search'))
-        ldap.connect()
-        ldap.authenticate(request.form['username'], request.form['password'])
-        info = ldap.user_info(request.form['username'])
+        success = auth()
 
-        session['groups'] = list(ldap.groups(info[1]['memberOf']))
-        session['username'] = request.form['username']
-
-    return render_template('login.html')
+    return render_template('login.html', success=success)
 
 
 @app.route('/search')
@@ -43,3 +38,15 @@ def backend():
         backend.permissions(session['groups'])
 
     return backend
+
+
+def auth():
+    auth_driver = plugins.get('auth', conf.get('auth', 'driver'))(conf.get('auth'))
+
+    if not auth_driver.authenticate(request.form['username'], request.form['password']):
+        return False
+
+    session['groups'] = auth_driver.groups()
+    session['username'] = request.form['username']
+
+    return True

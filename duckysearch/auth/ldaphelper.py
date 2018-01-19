@@ -2,7 +2,40 @@ import ldap
 from binascii import hexlify
 
 
-class LDAPHelper:
+class LDAPAuth(object):
+
+    _conf = {}
+
+    _auth_driver = None
+
+    _user_info = []
+
+    def __init__(self, conf):
+        self._conf = conf
+        self._auth_driver = LDAPHelper(conf['server'], conf['search'])
+        self._auth_driver.connect()
+
+    def authenticate(self, username, password):
+        self._user_info = {}
+
+        if username == '' or password == '':
+            return False
+
+        try:
+            self._auth_driver.authenticate(username, password)
+        except ldap.INVALID_CREDENTIALS:
+            return False
+
+        self._user_info = self._auth_driver.user_info(username)
+
+        return True
+
+    def groups(self):
+        '''return groups for authenticated user'''
+        return list(self._auth_driver.groups(self._user_info[1]['memberOf']))
+
+
+class LDAPHelper(object):
 
     _conn = None
     _server = None
@@ -17,7 +50,7 @@ class LDAPHelper:
         self._conn.set_option(ldap.OPT_REFERRALS, 1)
 
     def authenticate(self, username, password):
-        self._conn.bind_s(username, password)
+        self._conn.simple_bind_s(username, password)
 
     def user_info(self, username):
         info_result_id = self._conn.search(self._search, ldap.SCOPE_SUBTREE, 'cn=' + username, ['cn', 'objectSid', 'memberof', 'primaryGroupId'])
@@ -30,9 +63,6 @@ class LDAPHelper:
 
         for group_dn in group_dns:
             group = self.entry(group_dn, ['objectSid', 'memberOf'])
-
-            # debug group CN
-            print group[1][0][0]
 
             # FIXME if `group` is not a security group continue?
 

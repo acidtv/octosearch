@@ -12,6 +12,14 @@ label {
 	float: left;
 }
 
+.success {
+    color: green;
+}
+
+.error {
+    color: red;
+}
+
 .menu {
 	float: right;
 }
