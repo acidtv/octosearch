@@ -8,11 +8,15 @@
 
 <body>
 	<span class="menu">
-		<a href="/">Home</a> |
-		<a href="/login">Login</a>
-        {% if username %}
-            {{ username }}
-        {% endif %}
+		<a href="/">Home</a>
+		{% if has_auth_backend %}
+			|
+			{% if username %}
+				{{ username }}
+			{% else %}
+				<a href="/login">Login</a>
+			{% endif %}
+		{% endif %}
 	</span>
 
 	<h1>Duckysearch</h1>

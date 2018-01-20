@@ -1,13 +1,22 @@
 from . import app, conf
 from flask import render_template, request, session
 from .. import backends, plugins
+import ConfigParser
 
 
 @app.context_processor
 def template_vars():
     username = session['username'] if 'username' in session else ''
+    has_auth_backend = True
+
+    try:
+        print conf.get('auth')
+    except ConfigParser.NoSectionError:
+        has_auth_backend = False
+
     return dict(
-        username=username
+        username=username,
+        has_auth_backend=has_auth_backend
     )
 
 
