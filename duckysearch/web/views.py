@@ -10,7 +10,7 @@ def template_vars():
     has_auth_backend = True
 
     try:
-        print conf.get('auth')
+        conf.get('auth')
     except ConfigParser.NoSectionError:
         has_auth_backend = False
 
