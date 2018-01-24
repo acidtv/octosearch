@@ -57,6 +57,7 @@ def search():
         results=results,
         query=request.args['q'],
         page=page,
+        found=results['found'],
         next_page=None if len(results['hits']) < backend.pagesize() else page + 1,
         prev_page=None if page <= 1 else page - 1
     )

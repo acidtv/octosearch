@@ -1,10 +1,6 @@
 * {
 	font-family: Arial;
 }
-em {
-	font-weight: bold;
-	background-color: yellow;
-}
 
 label {
 	width: 100px;
@@ -24,6 +20,11 @@ label {
 	float: right;
 }
 
+.found {
+	color: #888;
+	font-style: italic;
+}
+
 .search_results .item {
     max-width: 1000px;
 }
@@ -36,9 +37,15 @@ label {
 
 .search_results .item .highlight {
     font-size: .9em;
-    color: #666;
+    color: #555;
     float: left;
     clear: left;
+}
+
+.search_results .item .highlight em {
+	font-weight: bold;
+	font-style: normal;
+	color: #000;
 }
 
 .paging {

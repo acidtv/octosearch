@@ -60,6 +60,7 @@ class BackendElasticSearch:
 
     def search(self, query_str, auth=None, page=1):
         query = {
+                '_source': ['id', 'path', 'filename', 'created', 'modified', 'mimetype'],
                 'highlight': {
                     'fields': {
                         'content': {}
@@ -108,9 +109,11 @@ class BackendElasticSearch:
         query['size'] = self._page_size
 
         result = self._es_call('get', '/' + self.index + '/_search', query)
+        print result
 
         return {
             'hits': list(self._format_results(result)),
+            'found': result['hits']['total']
         }
 
     def get_all(self):
