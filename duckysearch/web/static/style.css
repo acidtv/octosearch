@@ -41,3 +41,8 @@ label {
     clear: left;
 }
 
+.paging {
+    float: left;
+	clear: left;
+}
+

@@ -7,16 +7,21 @@
     <h2>Results</h2>
 
     <div class="search_results">
-    {% for result in results %}
-        <div class="item">
-            <span class="filename">{{result.filename}}</span><span style="color: grey"> &mdash; {{result.path}}</span>
-            <span class="highlight">
-                {% for snippet in result.highlight %}
-                    {{snippet|safe}} ...
-                {% endfor %}
-            </span>
-        </div>
-    {% endfor %}
+		{% for result in results.hits %}
+			<div class="item">
+				<span class="filename">{{result.filename}}</span><span style="color: grey"> &mdash; {{result.path}}</span>
+				<span class="highlight">
+					{% for snippet in result.highlight %}
+						{{snippet|safe}} ...
+					{% endfor %}
+				</span>
+			</div>
+		{% endfor %}
     </div>
+
+	<div class="paging">
+		<a href="?q={{query}}&page={{results.next_page}}">Next page</a>
+	</div>
+
 {% endblock %}
 

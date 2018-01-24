@@ -36,11 +36,23 @@ def login():
 
 @app.route('/search')
 def search():
-    results = backend().search(request.args['q'])
-    return render_template('search.html', results=results, query=request.args['q'])
+    backend = get_backend()
+
+    page = None
+
+    if 'next_page' in request.args:
+        page = request.args['next_page']
+
+    results = backend.search(query_str=request.args['q'], page=page)
+
+    return render_template(
+        'search.html',
+        results=results,
+        query=request.args['q'],
+    )
 
 
-def backend():
+def get_backend():
     backend = backends.elasticsearch.BackendElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))
 
     if 'auth' in session:

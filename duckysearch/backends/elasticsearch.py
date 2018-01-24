@@ -16,6 +16,11 @@ class BackendElasticSearch:
 
     _document_type = 'document'
 
+    _default_sort = [
+        {'_score': 'desc'},
+        {'_id': 'asc'}
+    ]
+
     def __init__(self, server, index):
         self.server = server
         self.index = index
@@ -51,7 +56,7 @@ class BackendElasticSearch:
         self._user_auth = auth
         self._user_groups = groups
 
-    def search(self, query_str, auth=None):
+    def search(self, query_str, auth=None, page=None):
         query = {
                 'highlight': {
                     'fields': {
@@ -66,7 +71,8 @@ class BackendElasticSearch:
                                 },
                             },
                         }
-                    }
+                    },
+                'sort': self._default_sort
                 }
 
         if not self._user_auth:
@@ -96,15 +102,20 @@ class BackendElasticSearch:
                         }
                     })
 
-        print query
+        if page:
+            query['search_after'] = self._parse_page(page)
+
         result = self._es_call('get', '/' + self.index + '/_search', query)
 
-        for document in self._format_results(result):
-            yield document
+        return {
+            'hits': list(self._format_results(result)),
+            'next_page': self._next_page(result)
+        }
 
     def get_all(self):
         '''Generator. Returns the entire index'''
 
+        # FIXME use elastic scrolling feature?
         result = self._es_call('get', '/' + self.index + '/_search', None)
         for document in self._format_results(result):
             yield document
@@ -155,6 +166,7 @@ class BackendElasticSearch:
         for document in results['hits']['hits']:
             dump = {
                     'id': document['_id'],
+                    'score': document['_score'],
                     'path': document['_source'].get('path'),
                     'filename': document['_source'].get('filename'),
                     'created': document['_source'].get('created'),
@@ -259,6 +271,27 @@ class BackendElasticSearch:
 
     def _get_error_desc(self, result):
         return result['error']['root_cause'][0]['reason']
+
+    def default_sort(self):
+        return self._default_sort
+
+    def _next_page(self, documents):
+        sort = []
+
+        try:
+            last_document = documents['hits']['hits'][-1]
+        except IndexError:
+            return None
+
+        for item in self._default_sort:
+            document_key = item.keys()[0]
+            sort.append(str(last_document[document_key]))
+
+        return ','.join(sort)
+
+    def _parse_page(self, pagestring):
+        '''Turn _next_page() string back in to list that can be used in search_after'''
+        return pagestring.split(',')
 
 
 class ElasticRequestError(Exception):
