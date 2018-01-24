@@ -1,6 +1,7 @@
 from . import app, conf
 from flask import render_template, request, session
 from .. import backends, plugins
+from werkzeug.exceptions import abort
 import ConfigParser
 
 
@@ -38,17 +39,26 @@ def login():
 def search():
     backend = get_backend()
 
-    page = None
+    page = 1
 
-    if 'next_page' in request.args:
-        page = request.args['next_page']
+    if 'page' in request.args and request.args['page']:
+        try:
+            page = int(request.args['page'])
+        except ValueError:
+            abort(404)
 
     results = backend.search(query_str=request.args['q'], page=page)
+
+    if len(results['hits']) == 0:
+        abort(404)
 
     return render_template(
         'search.html',
         results=results,
         query=request.args['q'],
+        page=page,
+        next_page=None if len(results['hits']) < backend.pagesize() else page + 1,
+        prev_page=None if page <= 1 else page - 1
     )
 
 

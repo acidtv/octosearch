@@ -46,3 +46,11 @@ label {
 	clear: left;
 }
 
+.paging .disabled {
+	color: #888;
+}
+
+.footer {
+	clear: left;
+	height: 100px;
+}

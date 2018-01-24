@@ -20,7 +20,19 @@
     </div>
 
 	<div class="paging">
-		<a href="?q={{query}}&page={{results.next_page}}">Next page</a>
+		{% if prev_page %}
+			<a href="?q={{query}}&page={{prev_page}}">Previous page</a>
+		{% else %}
+			<span class="disabled">Previous page</span>
+		{% endif %}
+
+		[ {{page}} ]
+
+		{% if next_page %}
+			<a href="?q={{query}}&page={{next_page}}">Next page</a>
+		{% else %}
+			<span class="disabled">Next page</span>
+		{% endif %}
 	</div>
 
 {% endblock %}

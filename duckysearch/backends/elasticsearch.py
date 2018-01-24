@@ -21,6 +21,8 @@ class BackendElasticSearch:
         {'_id': 'asc'}
     ]
 
+    _page_size = 10
+
     def __init__(self, server, index):
         self.server = server
         self.index = index
@@ -56,7 +58,7 @@ class BackendElasticSearch:
         self._user_auth = auth
         self._user_groups = groups
 
-    def search(self, query_str, auth=None, page=None):
+    def search(self, query_str, auth=None, page=1):
         query = {
                 'highlight': {
                     'fields': {
@@ -102,14 +104,13 @@ class BackendElasticSearch:
                         }
                     })
 
-        if page:
-            query['search_after'] = self._parse_page(page)
+        query['from'] = (page - 1) * self._page_size
+        query['size'] = self._page_size
 
         result = self._es_call('get', '/' + self.index + '/_search', query)
 
         return {
             'hits': list(self._format_results(result)),
-            'next_page': self._next_page(result)
         }
 
     def get_all(self):
@@ -275,23 +276,8 @@ class BackendElasticSearch:
     def default_sort(self):
         return self._default_sort
 
-    def _next_page(self, documents):
-        sort = []
-
-        try:
-            last_document = documents['hits']['hits'][-1]
-        except IndexError:
-            return None
-
-        for item in self._default_sort:
-            document_key = item.keys()[0]
-            sort.append(str(last_document[document_key]))
-
-        return ','.join(sort)
-
-    def _parse_page(self, pagestring):
-        '''Turn _next_page() string back in to list that can be used in search_after'''
-        return pagestring.split(',')
+    def pagesize(self):
+        return self._page_size
 
 
 class ElasticRequestError(Exception):
