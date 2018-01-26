@@ -36,13 +36,25 @@ class Mountedcifs(localfs.Localfs):
     # WA | WEA | A | W
     ACE_TYPE_ALL_WRITE_BITS = 0x40000116
 
+    _conf = None
+
+    def index(self, conf):
+        self._conf = conf
+        return super(Mountedcifs, self).indexl(conf)
+
     def process_file(self, path, file):
         metadata = super(Mountedcifs, self).process_file(path, file)
-        metadata.update(self.cifs_info(path, file))
+
+        metadata.update(self.cifs_acls(path, file))
+        metadata['url'] = self.cifs_url(metadata['path'])
 
         return metadata
 
-    def cifs_info(self, path, file):
+    def cifs_url(self, path, file):
+        full_path = path + file
+        return path.replace(full_path, self.conf['cifs_url'])
+
+    def cifs_acls(self, path, file):
         output = check_output(['getcifsacl', '-r', os.path.join(path, file)])
 
         acl = self.parse_cifsacl(output)

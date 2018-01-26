@@ -1,6 +1,8 @@
 import os
 import os.path
 import mimetypes
+import urlparse
+import urllib
 
 from ...indexer import LocalFile
 
@@ -38,7 +40,7 @@ class Localfs(object):
         metadata = {}
         metadata['filename'] = file
         metadata['path'] = path
-        metadata['url'] = file_full
+        metadata['url'] = path2url(file_full)
         metadata['extension'] = extension
         metadata['mimetype'] = mimetype
         metadata['created'] = statdata.st_ctime
@@ -81,3 +83,8 @@ class Localfs(object):
     def _get_mimetype(self, file):
         mimetype = mimetypes.guess_type(file)[0]
         return mimetype
+
+
+def path2url(path, protocol='file'):
+    '''Turns filesystem path into url with file: protocol'''
+    return urlparse.urljoin(protocol + ':', urllib.pathname2url(path))

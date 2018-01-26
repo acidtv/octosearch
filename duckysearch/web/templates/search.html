@@ -11,7 +11,8 @@
     <div class="search_results">
 		{% for result in results.hits %}
 			<div class="item">
-				<span class="filename">{{result.filename}}</span><span style="color: grey"> &mdash; {{result.path}}</span>
+				<span class="filename"><a href="{{result.url}}">{{result.filename}}</a></span>
+				<span style="color: grey"> &mdash; {{result.url}}</span>
 				<span class="highlight">
 					{% for snippet in result.highlight %}
 						{{snippet|safe}} ...

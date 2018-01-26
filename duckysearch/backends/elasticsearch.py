@@ -60,7 +60,7 @@ class BackendElasticSearch:
 
     def search(self, query_str, auth=None, page=1):
         query = {
-                '_source': ['id', 'path', 'filename', 'created', 'modified', 'mimetype'],
+                '_source': ['id', 'path', 'filename', 'created', 'modified', 'mimetype', 'url'],
                 'highlight': {
                     'fields': {
                         'content': {}
@@ -173,6 +173,7 @@ class BackendElasticSearch:
                     'score': document['_score'],
                     'path': document['_source'].get('path'),
                     'filename': document['_source'].get('filename'),
+                    'url': document['_source'].get('url'),
                     'created': document['_source'].get('created'),
                     'modified': document['_source'].get('modified'),
                     'mimetype': document['_source'].get('mimetype'),
@@ -190,6 +191,9 @@ class BackendElasticSearch:
                 self._document_type: {
                     "properties": {
                         "content": {
+                            "type": "text",
+                            },
+                        "url": {
                             "type": "text",
                             },
                         "read_allowed": {
