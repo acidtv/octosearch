@@ -49,7 +49,7 @@ def search():
 
     results = backend.search(query_str=request.args['q'], page=page)
 
-    if len(results['hits']) == 0:
+    if len(results['hits']) == 0 and page > 1:
         abort(404)
 
     return render_template(
