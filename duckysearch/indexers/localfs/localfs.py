@@ -49,11 +49,6 @@ class Localfs(object):
 
         return metadata
 
-    def get_file_content(self, metadata):
-        file_full = os.path.join(metadata['path'], metadata['filename'])
-        with open(file_full, 'r') as file_stream:
-            return file_stream.read()
-
     def check_removed(self):
         '''Check the index for removed files'''
 

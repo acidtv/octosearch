@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "903ea670e1e389320ed1f7cac23eb9b152bf693ab77c2e9e1ac1c68d43d3d473"
+            "sha256": "9f42fa6a964e130703c12987313e53d2dde5237fac32701562d5555e79c42fc3"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -9,9 +9,9 @@
             "os_name": "posix",
             "platform_machine": "x86_64",
             "platform_python_implementation": "CPython",
-            "platform_release": "4.4.0-97-generic",
+            "platform_release": "4.4.0-109-generic",
             "platform_system": "Linux",
-            "platform_version": "#120-Ubuntu SMP Tue Sep 19 17:28:18 UTC 2017",
+            "platform_version": "#132-Ubuntu SMP Tue Jan 9 19:52:39 UTC 2018",
             "python_full_version": "2.7.12",
             "python_version": "2.7",
             "sys_platform": "linux2"
@@ -60,12 +60,18 @@
             ],
             "version": "==1.0"
         },
+        "pypdf2": {
+            "hashes": [
+                "sha256:e28f902f2f0a1603ea95ebe21dff311ef09be3d0f0ef29a3e44a932729564385"
+            ],
+            "version": "==1.26.0"
+        },
         "werkzeug": {
             "hashes": [
-                "sha256:e8549c143af3ce6559699a01e26fa4174f4c591dbee0a499f3cd4c3781cdec3d",
-                "sha256:903a7b87b74635244548b30d30db4c8947fe64c5198f58899ddcd3a13c23bb26"
+                "sha256:d5da73735293558eb1651ee2fddc4d0dedcfa06538b8813a2e20011583c9e49b",
+                "sha256:c3fd7a7d41976d9f44db327260e263132466836cef6f91512889ed60ad26557c"
             ],
-            "version": "==0.12.2"
+            "version": "==0.14.1"
         }
     },
     "develop": {}

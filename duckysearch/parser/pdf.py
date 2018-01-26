@@ -1,30 +1,30 @@
+import PyPDF2
 
-from pyPdf.pdf import PdfFileReader
 
 class ParserPdf:
-	_extra = {}
+    _extra = {}
 
-	def types(self):
-		return {
-			'mimetypes': ['application/pdf']
-		}
+    def types(self):
+        return {
+                'mimetypes': ['application/pdf']
+                }
 
-	def parse(self, file):
-                with file.open_binary() as f:
-                    pdf = PdfFileReader(f)
+    def parse(self, file):
+        with file.open_binary() as f:
+            pdf = PyPDF2.PdfFileReader(f)
 
-                    pages = pdf.getNumPages()
-                    text = ''
+            pages = pdf.getNumPages()
+            text = ''
 
-                    self._extra['pages'] = pages
+            self._extra['pages'] = pages
 
-                    for pagenr in range(pages):
-                            page = pdf.getPage(pagenr-1)
-                            text += ' ' + page.extractText()
+            for pagenr in range(pages):
+                page = pdf.getPage(pagenr)
+                text += ' ' + page.extractText()
 
-		return text
+        return text
 
-	def extra(self):
-		'''Return extra info'''
+    def extra(self):
+        '''Return extra info'''
 
-		return self._extra
+        return self._extra

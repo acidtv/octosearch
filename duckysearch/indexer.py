@@ -49,12 +49,6 @@ class Indexer(object):
 
         return False
 
-    def get_file_content(self, indexer, metadata):
-        if 'content' in metadata:
-            return metadata['content']
-
-        return indexer.get_file_content(metadata)
-
     def file_id(self, metadata):
         return hashlib.md5(metadata['url']).hexdigest()
 
