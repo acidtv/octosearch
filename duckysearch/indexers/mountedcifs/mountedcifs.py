@@ -40,19 +40,19 @@ class Mountedcifs(localfs.Localfs):
 
     def index(self, conf):
         self._conf = conf
-        return super(Mountedcifs, self).indexl(conf)
+        return super(Mountedcifs, self).index(conf)
 
     def process_file(self, path, file):
         metadata = super(Mountedcifs, self).process_file(path, file)
 
         metadata.update(self.cifs_acls(path, file))
-        metadata['url'] = self.cifs_url(metadata['path'])
+        metadata['url'] = self.cifs_url(metadata['path'], metadata['filename'])
 
         return metadata
 
     def cifs_url(self, path, file):
         full_path = path + file
-        return path.replace(full_path, self.conf['cifs_url'])
+        return path.replace(full_path, self._conf['cifs-url'])
 
     def cifs_acls(self, path, file):
         output = check_output(['getcifsacl', '-r', os.path.join(path, file)])
