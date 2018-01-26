@@ -8,6 +8,8 @@ class ParserPlugins(object):
             'extensions': {}
             }
 
+    _fallback_mimetype = 'application/octet-stream'
+
     def __init__(self):
         """Load parsers to see which mimetypes they want
             to take care of"""
@@ -20,12 +22,15 @@ class ParserPlugins(object):
 
         # match by extension
         if extension and extension in self._parsers['extensions']:
-            return self._parsers['extensions'][extension].load()()
+            return self._parser_factory('extensions', extension)
 
         if mimetype:
             # look for direct mimetype match
             if mimetype in self._parsers['mimetypes']:
-                return self._parsers['mimetypes'][mimetype].load()()
+                return self._parser_factory('mimetypes', mimetype)
 
         # return fallback parser
-        return self._parsers['mimetypes'][None].load()
+        return self._parser_factory('mimetypes', self._fallback_mimetype)
+
+    def _parser_factory(self, parsertype, key):
+        return self._parsers[parsertype][key].load()()
