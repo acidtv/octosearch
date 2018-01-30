@@ -9,6 +9,7 @@ from duckysearch.backends import elasticsearch
 class Ducky:
     def start(self, args):
         conf = config.Config()
+        log = logger.Logger()
 
         if args.webserver:
             web.app.run(debug=True)
@@ -24,10 +25,13 @@ class Ducky:
 
             if args.index:
                 index_job = indexer.Indexer()
-                index_job.logger = logger.Logger()
+                index_job.logger = log
                 index_job.backend = elastic_backend
                 index_job.parsers = parserplugins.ParserPlugins()
-                index_job.index(conf.get('indexer'))
+
+                for indexer_conf in conf.get('indexer'):
+                    log.add('Indexing ' + indexer_conf['name'])
+                    index_job.index(indexer_conf)
 
 
 if __name__ == '__main__':
