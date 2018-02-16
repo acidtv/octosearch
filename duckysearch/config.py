@@ -20,9 +20,13 @@ class Config:
 
         for key in raw_config.sections():
             key_parts = key.split(':')
+
             data = dict(raw_config.items(key))
 
             if key_parts[0] in self._multi_keys:
+                if (len(key_parts) != 2):
+                    raise Exception('`%s` keys in config file must use a name in the key name, for example [indexer:foo]' % key)
+
                 data['name'] = key_parts[1]
                 parsed_config[key_parts[0]].append(data)
             else:

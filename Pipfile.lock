@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9f42fa6a964e130703c12987313e53d2dde5237fac32701562d5555e79c42fc3"
+            "sha256": "718dfec3c2a0066c2bcab6aafd2242f278778bb8d3efd934bc7227721fdcaead"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -9,9 +9,9 @@
             "os_name": "posix",
             "platform_machine": "x86_64",
             "platform_python_implementation": "CPython",
-            "platform_release": "4.4.0-109-generic",
+            "platform_release": "4.4.0-112-generic",
             "platform_system": "Linux",
-            "platform_version": "#132-Ubuntu SMP Tue Jan 9 19:52:39 UTC 2018",
+            "platform_version": "#135-Ubuntu SMP Fri Jan 19 11:48:36 UTC 2018",
             "python_full_version": "2.7.12",
             "python_version": "2.7",
             "sys_platform": "linux2"
@@ -65,6 +65,12 @@
                 "sha256:e28f902f2f0a1603ea95ebe21dff311ef09be3d0f0ef29a3e44a932729564385"
             ],
             "version": "==1.26.0"
+        },
+        "python-ldap": {
+            "hashes": [
+                "sha256:b8c134dfedaef0e6ff4a4b94277708dcadb758b448905a83b8946df077356ed2"
+            ],
+            "version": "==2.5.2"
         },
         "werkzeug": {
             "hashes": [

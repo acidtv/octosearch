@@ -12,4 +12,5 @@ name = "pypi"
 [packages]
 
 flask = "*"
-pypdf2 = "*"
+"pypdf2" = "*"
+python-ldap = "*"

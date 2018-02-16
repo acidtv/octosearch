@@ -5,6 +5,9 @@ from werkzeug.exceptions import abort
 
 
 def login_redir():
+    if 'username' in session:
+        return
+
     for indexer in conf.get('indexer'):
         if 'auth' not in indexer:
             return
@@ -28,6 +31,9 @@ def template_vars():
 
 @app.route('/')
 def index():
+    redir = login_redir()
+    if redir:
+        return redir
     return render_template('index.html')
 
 
