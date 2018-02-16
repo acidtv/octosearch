@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "718dfec3c2a0066c2bcab6aafd2242f278778bb8d3efd934bc7227721fdcaead"
+            "sha256": "975bae51ad8e434d43477ed44708ec24c07470168c20438531dc74e992ceb552"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -60,11 +60,11 @@
             ],
             "version": "==1.0"
         },
-        "pypdf2": {
+        "pdftotext": {
             "hashes": [
-                "sha256:e28f902f2f0a1603ea95ebe21dff311ef09be3d0f0ef29a3e44a932729564385"
+                "sha256:947359bde2f1d158d685414dcfb604a369f3fcee49012baf717a71816045d8ef"
             ],
-            "version": "==1.26.0"
+            "version": "==2.0.1"
         },
         "python-ldap": {
             "hashes": [

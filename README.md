@@ -12,6 +12,11 @@ mountedcifs:
 
  * getcifsacls
 
+### Installing dependencies
+
+    $ sudo apt-get install build-essential libpoppler-cpp-dev pkg-config python-dev
+    $ pipenv install
+
 Development
 -----------
 

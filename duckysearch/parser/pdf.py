@@ -1,4 +1,4 @@
-import PyPDF2
+import pdftotext
 
 
 class ParserPdf:
@@ -11,16 +11,11 @@ class ParserPdf:
 
     def parse(self, file):
         with file.open_binary() as f:
-            pdf = PyPDF2.PdfFileReader(f)
+            pdf = pdftotext.PDF(f)
+            pages = len(pdf)
+            text = "\n\n".join(pdf)
 
-            pages = pdf.getNumPages()
-            text = ''
-
-            self._extra['pages'] = pages
-
-            for pagenr in range(pages):
-                page = pdf.getPage(pagenr)
-                text += ' ' + page.extractText()
+        self._extra['pages'] = pages
 
         return text
 
