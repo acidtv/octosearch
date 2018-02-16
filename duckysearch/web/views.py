@@ -1,8 +1,15 @@
 from . import app, conf
-from flask import render_template, request, session
+from flask import render_template, request, session, redirect, url_for
 from .. import backends, plugins
 from werkzeug.exceptions import abort
-import ConfigParser
+
+
+def login_redir():
+    for indexer in conf.get('indexer'):
+        if 'auth' not in indexer:
+            return
+
+    return redirect(url_for('login'))
 
 
 @app.context_processor
@@ -10,9 +17,7 @@ def template_vars():
     username = session['username'] if 'username' in session else ''
     has_auth_backend = True
 
-    try:
-        conf.get('auth')
-    except ConfigParser.NoSectionError:
+    if conf.get('auth') is None:
         has_auth_backend = False
 
     return dict(
@@ -37,6 +42,10 @@ def login():
 
 @app.route('/search')
 def search():
+    redir = login_redir()
+    if redir:
+        return redir
+
     backend = get_backend()
 
     page = 1

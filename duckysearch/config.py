@@ -31,6 +31,9 @@ class Config:
         return parsed_config
 
     def get(self, section, option=None):
+        if section not in self._config:
+            return None
+
         if option is None:
             return self._config[section]
         else:
