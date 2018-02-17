@@ -14,6 +14,10 @@ Requirements
 Development
 -----------
 
+First, deploy the project in 'development mode' with setuptools:
+
+    $ python setup.py develop
+
 To start the web interface: 
 
     $ pipenv run ./ducky.py --webserver indexname
