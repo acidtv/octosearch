@@ -5,16 +5,10 @@ Requirements
 ------------
 
  * pipenv
- * flask
- * python-ldap
-
-mountedcifs:
-
- * getcifsacls
 
 ### Installing dependencies
 
-    $ sudo apt-get install build-essential libpoppler-cpp-dev pkg-config python-dev
+    $ sudo apt-get install build-essential libpoppler-cpp-dev pkg-config python-dev libldap2-dev libsasl2-dev cifs-utils
     $ pipenv install
 
 Development
