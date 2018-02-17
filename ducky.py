@@ -8,7 +8,7 @@ from duckysearch.backends import elasticsearch
 
 class Ducky:
     def start(self, args):
-        conf = config.Config()
+        conf = config.Config(args.config)
         log = logger.Logger()
 
         if args.webserver:
@@ -38,10 +38,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Filesystem indexer')
     parser.add_argument('--index', dest='index', required=False, action='store_true', help='Start indexing.')
     parser.add_argument('--webserver', dest='webserver', required=False, action='store_true', help='Start the webserver interface.')
-    parser.add_argument('-cr', dest='check_removed', required=False, action='store_true', help='Check index for removed files.')
     parser.add_argument('--truncate', dest='truncate', required=False, action='store_true', help='Truncate index.')
-    parser.add_argument('-if', dest='ignore_files', required=False, help='Files to ignore. Regular expressions can be used.')
-    parser.add_argument('-im', dest='ignore_mimes', required=False, help='Mimetypes to ignore. Regular expressions can be used.')
+    parser.add_argument(
+        '--config',
+        dest='config',
+        required=False,
+        help='Specify a config file. Defaults to config.ini in current folder.',
+        default='config.ini')
+    # parser.add_argument('-cr', dest='check_removed', required=False, action='store_true', help='Check index for removed files.')
+    # parser.add_argument('-if', dest='ignore_files', required=False, help='Files to ignore. Regular expressions can be used.')
+    # parser.add_argument('-im', dest='ignore_mimes', required=False, help='Mimetypes to ignore. Regular expressions can be used.')
     args = parser.parse_args()
 
     app = Ducky()

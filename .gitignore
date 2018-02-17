@@ -3,5 +3,5 @@ testfiles/*
 *.sublime-*
 TODO*
 .vimproject
-config.ini
+config*.ini
 *.egg-info
