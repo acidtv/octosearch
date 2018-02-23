@@ -20,6 +20,7 @@ class Indexer(object):
 
     def index(self, conf):
         indexer = plugins.get('indexer', conf['indexer'])()
+        start_time = datetime.datetime.now()
 
         if 'ignore-extensions' in conf:
             self.ignore_extensions = conf['ignore-extensions']
@@ -37,6 +38,9 @@ class Indexer(object):
                 self.logger.add(metadata['url'] + ' (' + str(metadata['mimetype']) + ')')
                 document = self.prepare_document(file, conf)
                 self.backend.add(id, document)
+
+        self.logger.add('Purging removed files from index...')
+        self.backend.remove_seen_older_than(self._datetime_to_epoch(start_time))
 
     def backend_document(self, id, sourcename):
         backend_document = None

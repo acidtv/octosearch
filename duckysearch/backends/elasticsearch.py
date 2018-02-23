@@ -161,6 +161,19 @@ class BackendElasticSearch:
 
         self._es_call('delete', '/' + self.index)
 
+    def remove_seen_older_than(self, seen):
+        '''Remove documents where last_seen is older than seen'''
+
+        query = {
+                'query': {
+                    'range': {
+                        'last_seen': {'lt': seen}
+                        }
+                    }
+                }
+
+        self._es_call('post', '/' + self.index + '/_delete_by_query', query)
+
     def _format_results(self, results):
         '''Generator. Normalize elastic search results'''
 
