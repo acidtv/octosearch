@@ -218,6 +218,9 @@ class BackendElasticSearch:
                         "modified": {
                             "type": "date",
                             },
+                        "last_seen": {
+                            "type": "date",
+                            },
 
                         # text / keyword fields for search flexibility
                         "filename": {

@@ -1,5 +1,6 @@
 import plugins
 import hashlib
+import datetime
 from io import BytesIO, StringIO
 
 
@@ -26,21 +27,34 @@ class Indexer(object):
         for file in indexer.index(conf):
             metadata = file.metadata()
             id = self.file_id(metadata)
-            if not self.ignore_file(id, metadata, conf['name']):
+            backend_document = self.backend_document(id, conf['name'])
+
+            if backend_document and not self.modified(metadata, backend_document):
+                self.logger.add(metadata['url'] + ' not modified, updating last seen date')
+                self.backend.add(id, self.last_seen())
+
+            elif not self.ignore_file(metadata):
                 self.logger.add(metadata['url'] + ' (' + str(metadata['mimetype']) + ')')
                 document = self.prepare_document(file, conf)
                 self.backend.add(id, document)
 
-    def ignore_file(self, id, metadata, sourcename):
-        # FIXME query a bunch of ids at the same time, instead of doing a query for every file
+    def backend_document(self, id, sourcename):
+        backend_document = None
+
         try:
             backend_document = self.backend.get_keys([id], sourcename).next()
-
-            if metadata['modified'] <= backend_document['modified']:
-                return True
         except StopIteration:
             pass
+        finally:
+            return backend_document
 
+    def modified(self, metadata, backend_document):
+        if metadata['modified'] <= backend_document['modified']:
+            return False
+
+        return True
+
+    def ignore_file(self, metadata):
         if metadata['extension'] in self.ignore_extensions:
             return True
 
@@ -60,11 +74,18 @@ class Indexer(object):
         document['sourcename'] = conf['name']
         document['content'] = parsed_content
         document['filetype_metadata'] = filetype_metadata
+        document['last_seen'] = self.last_seen()['last_seen']
 
         document['auth'] = ''
 
         if 'auth' in conf:
             document['auth'] = conf['auth']
+
+        return document
+
+    def last_seen(self):
+        document = {}
+        document['last_seen'] = self._datetime_to_epoch(datetime.datetime.now())
 
         return document
 
@@ -84,6 +105,9 @@ class Indexer(object):
             raise Exception('Extra info from parser must be dict')
 
         return content, filetype_metadata
+
+    def _datetime_to_epoch(self, dt):
+        return (dt - datetime.datetime(1970, 1, 1)).total_seconds()
 
 
 class File(object):
