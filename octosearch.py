@@ -2,11 +2,11 @@
 
 import argparse
 
-from duckysearch import web, config, indexer, parserplugins, logger
-from duckysearch.backends import elasticsearch
+from octosearch import web, config, indexer, parserplugins, logger
+from octosearch.backends import elasticsearch
 
 
-class Ducky:
+class Octo:
     def start(self, args):
         conf = config.Config(args.config)
         log = logger.Logger()
@@ -50,5 +50,5 @@ if __name__ == '__main__':
     # parser.add_argument('-im', dest='ignore_mimes', required=False, help='Mimetypes to ignore. Regular expressions can be used.')
     args = parser.parse_args()
 
-    app = Ducky()
+    app = Octo()
     app.start(args)

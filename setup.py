@@ -1,20 +1,20 @@
 from setuptools import setup, find_packages
 
 setup(
-        name='duckysearch',
+        name='octosearch',
         packages=find_packages(),
         entry_points={
-            'duckysearch.indexer': [
-                'localfs = duckysearch.indexers.localfs.localfs:Localfs',
-                'mountedcifs = duckysearch.indexers.mountedcifs.mountedcifs:Mountedcifs',
+            'octosearch.indexer': [
+                'localfs = octosearch.indexers.localfs.localfs:Localfs',
+                'mountedcifs = octosearch.indexers.mountedcifs.mountedcifs:Mountedcifs',
                 ],
-            'duckysearch.parser': [
-                'application/pdf = duckysearch.parser.pdf:ParserPdf',
-                'text/* = duckysearch.parser.text:ParserText',
-                'application/octet-stream = duckysearch.parser.fallback:ParserFallback'
+            'octosearch.parser': [
+                'application/pdf = octosearch.parser.pdf:ParserPdf',
+                'text/* = octosearch.parser.text:ParserText',
+                'application/octet-stream = octosearch.parser.fallback:ParserFallback'
                 ],
-            'duckysearch.auth': [
-                'ldap = duckysearch.auth.ldaphelper:LDAPAuth',
+            'octosearch.auth': [
+                'ldap = octosearch.auth.ldaphelper:LDAPAuth',
                 ]
             }
         )

@@ -1,5 +1,5 @@
-Ducky
-=====
+Octosearch
+==========
 
 Requirements
 ------------
@@ -20,7 +20,7 @@ First, deploy the project in 'development mode' with setuptools:
 
 To start the web interface: 
 
-    $ pipenv run ./ducky.py --webserver indexname
+    $ pipenv run ./octosearch.py --webserver indexname
 
 An elastic search server can be started with docker.
 For a first time, run:
@@ -38,7 +38,7 @@ Troubleshooting
 
 This project is still in the early stages of it's development, so the elasticsearch field mappings change from time to time. Try truncating and re-indexing.
 
-    $ pipenv run ./ducky.py --truncate && pipenv run ./ducky.py --index
+    $ pipenv run ./octosearch.py --truncate && pipenv run ./octosearch.py --index
 
 ### In case you get a systemd error with docker about a cpu.shares file not found
 
