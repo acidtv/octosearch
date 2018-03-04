@@ -37,6 +37,7 @@
 		display: inline-block;
 		position: relative;
 	}
+
 	.example-tile-icon::before {
 		display: block;
 		position: absolute;
@@ -49,11 +50,38 @@
 		height: 0;
 		border-width: 4px;
 	}
+
+	/*
+	.topbar {
+		background-color: #13538F;
+		margin-bottom: 1rem;
+	}
+
+	.navbar a {
+		color: white !important;
+	}
+	*/
+
 	</style>
 
 	<body>
 
+		<div class="topbar">
+			<div class="container grid-lg">
+				<header class="navbar">
+					<section class="navbar-section">
+						<a href="" class="navbar-brand mr-2">Octosearch</a>
+					</section>
+					<section class="navbar-section">
+						Alex
+						<a href="" class="btn btn-link">About</a>
+					</section>
+				</header>
+			</div>
+		</div>
+
 		<div class="container grid-lg">
+			<!--
 			<header class="navbar">
 				<section class="navbar-section">
 					<a href="" class="navbar-brand mr-2">Octosearch</a>
@@ -63,12 +91,6 @@
 					<a href="" class="btn btn-link">About</a>
 				</section>
 			</header>
-
-			<!--
-			<ul class="breadcrumb">
-				<li class="breadcrumb-item">Home</li>
-				<li class="breadcrumb-item">Login</li>
-			</ul>
 			-->
 
 			<div class="searchbar columns">
