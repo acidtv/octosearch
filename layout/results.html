@@ -6,6 +6,15 @@
 		  <link rel="stylesheet" href="spectre.min.css" />
 	</head>
 	<style>
+	.navbar .sep:before {
+		content: "|";
+		color: #EEE;
+	}
+
+	.navbar span.btn {
+		color: #50596c
+	}
+
 	.searchbar {
 		padding: 2rem 0 3rem;
 	}
@@ -74,8 +83,9 @@
 						<a href="" class="navbar-brand mr-2">Octosearch</a>
 					</section>
 					<section class="navbar-section">
-						Alex
-						<a href="" class="btn btn-link">About</a>
+						<span class="navbar-item btn btn-link">Alex</span>
+						<span class="sep"></span>
+						<a href="" class="navbar-item btn btn-link">About</a>
 					</section>
 				</header>
 			</div>
