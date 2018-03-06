@@ -1,28 +1,40 @@
-<html>
-<head>
-	<title>Octosearch</title>
-	<script language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-	<script language="javascript" src="underscore-min.js"></script>
-	<link href="/static/style.css" type="text/css" rel="stylesheet" />
-</head>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		  <meta charset="utf-8">
+		  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+		  <link href="/static/spectre.min.css" type="text/css" rel="stylesheet" />
+		  <link href="/static/style.css" type="text/css" rel="stylesheet" />
+	</head>
+	<body>
 
-<body>
-	<span class="menu">
-		<a href="/">Home</a>
-		{% if has_auth_backend %}
-			|
-			{% if username %}
-				{{ username }}
-			{% else %}
-				<a href="/login">Login</a>
-			{% endif %}
-		{% endif %}
-	</span>
+		<div class="topbar">
+			<div class="container grid-lg">
+				<header class="navbar">
+					<section class="navbar-section">
+						<a href="" class="navbar-brand mr-2">Octosearch</a>
+					</section>
+					<section class="navbar-section">
+						{% if has_auth_backend %}
+							|
+							{% if username %}
+								<span class="navbar-item btn btn-link">{{ username }}</span>
+							{% else %}
+								<a class="navbar-item btn btn-link" href="/login">Login</a>
+							{% endif %}
+						{% endif %}
+						<span class="sep"></span>
+						<a href="" class="navbar-item btn btn-link">About</a>
+					</section>
+				</header>
+			</div>
+		</div>
 
-	<h1>Octosearch</h1>
+		<div class="container grid-lg">
 
-	{% block content %}{% endblock %}
+			{% block content %}{% endblock %}
 
-	<div class="footer"></div>
-</body>
+		</div>
+
+	</body>
 </html>

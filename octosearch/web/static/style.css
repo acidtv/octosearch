@@ -1,63 +1,101 @@
-* {
-	font-family: Arial;
+.primary {
+	color: #13538F;
 }
 
-label {
-	width: 100px;
-	display: block;
-	float: left;
+.navbar .sep:before {
+	content: "|";
+	color: #EEE;
 }
 
-.success {
-    color: green;
+.navbar span.btn {
+	color: #50596c
 }
 
-.error {
-    color: red;
+.navbar .navbar-section .btn.btn-link {
+	color: #13538F;
 }
 
-.menu {
-	float: right;
+.searchbar {
+	padding: 2rem 0 3rem;
 }
 
-.found {
-	color: #888;
-	font-style: italic;
+.results .tile {
+	margin-bottom: 1rem;
 }
 
-.search_results .item {
-    max-width: 1000px;
+.results .url {
+	color: #080;
+	font-size: .6rem;
 }
 
-.search_results .item {
-    float: left;
-    clear: left;
-    margin-bottom: 20px;
+.results .tile-title {
+	margin-bottom: .7rem;
 }
 
-.search_results .item .highlight {
-    font-size: .9em;
-    color: #555;
-    float: left;
-    clear: left;
+.results .tile-subtitle {
+	font-size: .7rem;
+	margin-bottom: 0;
 }
 
-.search_results .item .highlight em {
+.example-tile-icon {
+	border: 2px solid blue;
+	font-size: .5rem;
 	font-weight: bold;
-	font-style: normal;
-	color: #000;
+	color: blue;
+	padding: .35rem .10rem;
+	display: inline-block;
+	position: relative;
+	top: -0.30rem;
 }
 
-.paging {
-    float: left;
-	clear: left;
+.example-tile-icon::before {
+	display: block;
+	position: absolute;
+	content: "";
+	top: -2px;
+	right: -2px;
+	border-style: solid;
+	border-color: #FFF #FFF blue blue;
+	width: 0;
+	height: 0;
+	border-width: 4px;
 }
 
-.paging .disabled {
-	color: #888;
+///////////////////////////////////
+
+body.home {
+	height: 100%;
+	background: repeat url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='5' height='5'><rect transform='translate(0, 0), rotate(5, 25, 25), scale(1)' x='0' y='0' width='5' height='6' fill='#F6F6F6' stroke='none' class='shape-overlay'></rect></svg>");
 }
 
-.footer {
-	clear: left;
-	height: 100px;
+.home .container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	height: 100%;
+}
+
+.home .container .columns {
+	width: 100%;
+}
+
+.home .container .logo {
+	max-height: 4rem;
+	margin-bottom: 1rem;
+}
+
+.home .container .input-group {
+	width: 100%;
+	max-width: 30rem;
+}
+
+.home .container .searchbox {
+	margin-top: -5rem; /* 0-(logo-height+logo-bottom-margin) */
+	text-align: center;
+}
+
+.home header.navbar {
+	position: absolute;
+	width: 100%;
 }

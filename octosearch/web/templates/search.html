@@ -1,26 +1,39 @@
 {% extends "template.html" %}
 {% block content %}
-	<h2>Search</h2>
 
-    {% include 'snippets/search-bar.html' %}
-
-    <h2>Results</h2>
+	<div class="searchbar columns">
+		<div class="centered">
+			<div class="input-group input-inline ">
+				<input class="form-input" type="text" placeholder="What are you looking for?">
+				<button class="btn btn-secondary input-group-btn">Search</button>
+			</div>
+		</div>
+	</div>
 
 	<p class="found">Found {{found}} documents.</p>
 
-    <div class="search_results">
+	<div class="results">
+
 		{% for result in results.hits %}
-			<div class="item">
-				<span class="filename"><a href="{{result.url}}">{{result.filename}}</a></span>
-				<span style="color: grey"> &mdash; {{result.url}}</span>
-				<span class="highlight">
-					{% for snippet in result.highlight %}
-						{{snippet|safe}} ...
-					{% endfor %}
-				</span>
+			<div class="tile">
+				<div class="tile-icon">
+					<div class="example-tile-icon">
+						DDD
+					</div>
+				</div>
+				<div class="tile-content">
+					<p class="tile-title"><a href="{{result.url}}">{{result.filename}}</a></p>
+					<p class="tile-subtitle text-gray">
+						{% for snippet in result.highlight %}
+							{{snippet|safe}} ...
+						{% endfor %}
+					</p>
+					<span class="url">{{result.url}}</span>
+				</div>
 			</div>
 		{% endfor %}
-    </div>
+
+	</div>
 
 	<div class="paging">
 		{% if prev_page %}

@@ -1,4 +1,31 @@
-{% extends "template.html" %}
-{% block content %}
-    {% include 'snippets/search-bar.html' %}
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+		<link href="/static/spectre.min.css" type="text/css" rel="stylesheet" />
+		<link href="/static/style.css" type="text/css" rel="stylesheet" />
+	</head>
+	<body class="home">
+		<header class="navbar">
+			<section class="navbar-section"> </section>
+			<section class="navbar-section">
+				<a href="" class="btn btn-link">Login</a>
+				<a href="" class="btn btn-link">About</a>
+			</section>
+		</header>
+
+		<div class="container">
+			<div class="columns ">
+				<div class="searchbox column col-12">
+					<img class="logo centered" src="octopus-tmp.svg" />
+					<div class="input-group input-inline">
+						<input class="form-input" type="text" placeholder="What are you looking for?">
+						<button class="btn btn-secondary input-group-btn">Search</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+</html>

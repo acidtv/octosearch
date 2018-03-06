@@ -1,16 +1,28 @@
 {% extends "template.html" %}
 {% block content %}
-	<h2>Login</h2>
+	<h1>Login</h1>
 
-    {% if success == True %}
-        <p class="success">Login successful</p>
-    {% elif success == False %}
-        <p class="error">Login failed</p>
-    {% endif %}
+	{% if success == True %}
+		<p class="success">Login successful</p>
+	{% elif success == False %}
+		<p class="error">Login failed</p>
+	{% endif %}
 
-	<form method="post">
-		<label>Username</label><input name="username" value="" /><br />
-		<label>Password</label><input name="password" type="password" /><br />
-		<input type="submit" value="Submit" />
-	</form>
+	<p>
+		You are logging in to AUTH_PROVIDER.
+	</p>
+
+	<div class="columns">
+		<div class="column col-xs-12 col-sm-10 col-md-8 col-5">
+			<div class="form-group">
+				<label class="form-label" for="input-username">Username</label>
+				<input class="form-input" type="text" id="input-username" name="username" placeholder="FIXME">
+				<label class="form-label" for="input-password">Password</label>
+				<input class="form-input" type="password" id="input-password" name="password" placeholder="FIXME">
+			</div>
+			<div class="form-group">
+				<button class="btn btn-primary float-right">Submit</button>
+			</div>
+		</div>
+	</div>
 {% endblock %}
