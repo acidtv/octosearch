@@ -5,27 +5,36 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
 		<link href="/static/spectre.min.css" type="text/css" rel="stylesheet" />
 		<link href="/static/style.css" type="text/css" rel="stylesheet" />
+        <style>
+            html, body {
+                height: 100%;
+            }
+            body {
+                background: repeat url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='5' height='5'><rect transform='translate(0, 0), rotate(5, 25, 25), scale(1)' x='0' y='0' width='5' height='6' fill='#F6F6F6' stroke='none' class='shape-overlay'></rect></svg>");
+            }
+        </style>
 	</head>
-	<body class="home">
-		<header class="navbar">
-			<section class="navbar-section"> </section>
-			<section class="navbar-section">
-				<a href="" class="btn btn-link">Login</a>
-				<a href="" class="btn btn-link">About</a>
-			</section>
-		</header>
+	<body>
+        <div class="home">
+            <header class="navbar">
+                <section class="navbar-section"> </section>
+                <section class="navbar-section">
+                    <a href="" class="btn btn-link">Login</a>
+                    <a href="" class="btn btn-link">About</a>
+                </section>
+            </header>
 
-		<div class="container">
-			<div class="columns ">
-				<div class="searchbox column col-12">
-					<img class="logo centered" src="octopus-tmp.svg" />
-					<div class="input-group input-inline">
-						<input class="form-input" type="text" placeholder="What are you looking for?">
-						<button class="btn btn-secondary input-group-btn">Search</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
+            <div class="container">
+                <div class="columns ">
+                    <div class="searchbox column col-12">
+                        <img class="logo centered" src="/static/octopus-tmp.svg" />
+                        <div class="input-group input-inline">
+                            <input class="form-input" type="text" placeholder="What are you looking for?">
+                            <button class="btn btn-secondary input-group-btn">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 	</body>
 </html>

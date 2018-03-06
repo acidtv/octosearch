@@ -61,11 +61,10 @@
 	border-width: 4px;
 }
 
-///////////////////////////////////
+/* homepage */
 
-body.home {
-	height: 100%;
-	background: repeat url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='5' height='5'><rect transform='translate(0, 0), rotate(5, 25, 25), scale(1)' x='0' y='0' width='5' height='6' fill='#F6F6F6' stroke='none' class='shape-overlay'></rect></svg>");
+.home {
+    height: 100%;
 }
 
 .home .container {
@@ -83,6 +82,7 @@ body.home {
 .home .container .logo {
 	max-height: 4rem;
 	margin-bottom: 1rem;
+    opacity: 0.4;
 }
 
 .home .container .input-group {
@@ -90,12 +90,12 @@ body.home {
 	max-width: 30rem;
 }
 
-.home .container .searchbox {
-	margin-top: -5rem; /* 0-(logo-height+logo-bottom-margin) */
-	text-align: center;
+.home header.navbar {
+        position: absolute;
+        width: 100%;
 }
 
-.home header.navbar {
-	position: absolute;
-	width: 100%;
+.home .container .searchbox {
+	margin-top: -5rem;
+	text-align: center;
 }
