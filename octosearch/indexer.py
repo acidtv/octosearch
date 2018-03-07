@@ -36,7 +36,13 @@ class Indexer(object):
 
             elif not self.ignore_file(metadata):
                 self.logger.add(metadata['url'] + ' (' + str(metadata['mimetype']) + ')')
-                document = self.prepare_document(file, conf)
+
+                try:
+                    document = self.prepare_document(file, conf)
+                except Exception as e:
+                    self.logger.add('Could not prepare document for file %s: %s' % (file, e))
+                    continue
+
                 self.backend.add(id, document)
 
         self.logger.add('Purging removed files from index...')
