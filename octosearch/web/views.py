@@ -2,6 +2,7 @@ from . import app, conf
 from flask import render_template, request, session, redirect, url_for
 from .. import backends, plugins
 from werkzeug.exceptions import abort
+import mimetypes
 
 
 def login_redir():
@@ -67,15 +68,32 @@ def search():
     if len(results['hits']) == 0 and page > 1:
         abort(404)
 
+    next_page = None if len(results['hits']) < backend.pagesize() else page + 1
+    prev_page = None if page <= 1 else page - 1
+    results['hits'] = prepare_hits(results['hits'])
+
     return render_template(
         'search.html',
         results=results,
         query=request.args['q'],
-        page=page,
         found=results['found'],
-        next_page=None if len(results['hits']) < backend.pagesize() else page + 1,
-        prev_page=None if page <= 1 else page - 1
+        page=page,
+        next_page=next_page,
+        prev_page=prev_page
     )
+
+
+def prepare_hits(hits):
+    '''Add the file extension for displaying icon. Guess based on mimetype'''
+
+    for hit in hits:
+        if hit['mimetype']:
+            try:
+                hit['extension'] = mimetypes.guess_extension(hit['mimetype'])[1:4]
+            except TypeError:
+                hit['extension'] = ''
+
+        yield hit
 
 
 def get_backend():
