@@ -24,7 +24,17 @@
 					</div>
 				</div>
 				<div class="tile-content">
-					<p class="tile-title"><a href="{{result.url}}">{{result.filename}}</a></p>
+					<p class="tile-title">
+                        <a href="{{result.url}}">
+                            {% if result.title %}
+                                {{result.title}}
+                            {% elif result.filename %}
+                                {{result.filename}}
+                            {% elif result.url %}
+                                {{result.url}}
+                            {% endif %}
+                        </a>
+                    </p>
 					<p class="tile-subtitle text-gray">
 						{% for snippet in result.highlight %}
 							{{snippet|safe}} ...
@@ -37,21 +47,19 @@
 
 	</div>
 
-	<div class="paging">
-		{% if prev_page %}
+	<ul class=" pagination">
+		<li class="page-item {% if not prev_page %}disabled{% endif %}">
 			<a href="?q={{query}}&page={{prev_page}}">Previous page</a>
-		{% else %}
-			<span class="disabled">Previous page</span>
-		{% endif %}
+		</li>
 
-		[ {{page}} ]
+		<li class="page-item active">
+			<a>{{page}}</a>
+		</li>
 
-		{% if next_page %}
+		<li class="page-item {% if not next_page %}disabled{% endif %}">
 			<a href="?q={{query}}&page={{next_page}}">Next page</a>
-		{% else %}
-			<span class="disabled">Next page</span>
-		{% endif %}
-	</div>
+		</li>
+	</ul>
 
 {% endblock %}
 

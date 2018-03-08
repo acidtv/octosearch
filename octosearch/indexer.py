@@ -83,8 +83,10 @@ class Indexer(object):
         document = file.metadata()
         document['sourcename'] = conf['name']
         document['content'] = parsed_content
-        document['filetype_metadata'] = filetype_metadata
         document['last_seen'] = self.last_seen()['last_seen']
+
+        # file type specific metadata
+        document['filetype_metadata'] = filetype_metadata
 
         document['auth'] = ''
 
