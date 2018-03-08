@@ -90,6 +90,11 @@
 	max-width: 30rem;
 }
 
+.home .container form {
+	display: inherit;
+	width: 100%;
+}
+
 .home header.navbar {
         position: absolute;
         width: 100%;
