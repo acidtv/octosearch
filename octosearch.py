@@ -16,27 +16,43 @@ class Octo:
         else:
             elastic_backend = elasticsearch.BackendElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))
 
-            # FIXME
-            # if args.check_removed:
-            #     indexer.check_removed()
-
             if args.truncate:
                 elastic_backend.truncate()
 
-            if args.index:
+            if args.index is not None:
                 index_job = indexer.Indexer()
                 index_job.logger = log
                 index_job.backend = elastic_backend
                 index_job.parsers = parserplugins.ParserPlugins()
 
-                for indexer_conf in conf.get('indexer'):
+                indexes = None
+
+                if args.index is True:
+                    indexes = conf.get('indexer')
+                else:
+                    for indexer_conf in conf.get('indexer'):
+                        if indexer_conf['name'] == args.index:
+                            indexes = [indexer_conf]
+
+                    if indexes is None:
+                        raise Exception('Index not found: %s' % args.index)
+
+                for indexer_conf in indexes:
                     log.add('Indexing ' + indexer_conf['name'])
                     index_job.index(indexer_conf)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Filesystem indexer')
-    parser.add_argument('--index', dest='index', required=False, action='store_true', help='Start indexing.')
+    parser.add_argument(
+        '--index',
+        dest='index',
+        required=False,
+        action='store',
+        nargs='?',
+        const=True,
+        help='Start indexing.'
+    )
     parser.add_argument('--webserver', dest='webserver', required=False, action='store_true', help='Start the webserver interface.')
     parser.add_argument('--truncate', dest='truncate', required=False, action='store_true', help='Truncate index.')
     parser.add_argument(

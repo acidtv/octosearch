@@ -119,7 +119,6 @@ class BackendElasticSearch:
         query['size'] = self._page_size
 
         result = self._es_call('get', '/' + self.index + '/_search', query)
-        print result
 
         return {
             'hits': list(self._format_results(result)),
