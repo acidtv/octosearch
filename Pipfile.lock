@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "975bae51ad8e434d43477ed44708ec24c07470168c20438531dc74e992ceb552"
+            "sha256": "34af9d6b5d42284d6d758c0d47239cb97976fb6dfdc47709503a70b043e510af"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -9,9 +9,9 @@
             "os_name": "posix",
             "platform_machine": "x86_64",
             "platform_python_implementation": "CPython",
-            "platform_release": "4.4.0-112-generic",
+            "platform_release": "4.4.0-116-generic",
             "platform_system": "Linux",
-            "platform_version": "#135-Ubuntu SMP Fri Jan 19 11:48:36 UTC 2018",
+            "platform_version": "#140-Ubuntu SMP Mon Feb 12 21:23:04 UTC 2018",
             "python_full_version": "2.7.12",
             "python_version": "2.7",
             "sys_platform": "linux2"
@@ -27,6 +27,20 @@
         ]
     },
     "default": {
+        "beautifulsoup4": {
+            "hashes": [
+                "sha256:7015e76bf32f1f574636c4288399a6de66ce08fb7b2457f628a8d70c0fbabb11",
+                "sha256:11a9a27b7d3bddc6d86f59fb76afb70e921a25ac2d6cc55b40d072bd68435a76",
+                "sha256:808b6ac932dccb0a4126558f7dfdcf41710dd44a4ef497a0bb59a77f9f078e89"
+            ],
+            "version": "==4.6.0"
+        },
+        "bs4": {
+            "hashes": [
+                "sha256:36ecea1fd7cc5c0c6e4a1ff075df26d50da647b75376626cc186e2212886dd3a"
+            ],
+            "version": "==0.0.1"
+        },
         "click": {
             "hashes": [
                 "sha256:29f99fc6125fbc931b758dc053b3114e55c77a6e4c6c3a2674a2dc986016381d",
@@ -62,9 +76,9 @@
         },
         "pdftotext": {
             "hashes": [
-                "sha256:947359bde2f1d158d685414dcfb604a369f3fcee49012baf717a71816045d8ef"
+                "sha256:0b82a9fd255a3f2bf5c861cf9e3174d3c4223e1e441bb060c611dcb4e65c6cb8"
             ],
-            "version": "==2.0.1"
+            "version": "==2.0.2"
         },
         "python-ldap": {
             "hashes": [

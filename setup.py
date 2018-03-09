@@ -7,6 +7,7 @@ setup(
             'octosearch.indexer': [
                 'localfs = octosearch.indexers.localfs.localfs:Localfs',
                 'mountedcifs = octosearch.indexers.mountedcifs.mountedcifs:Mountedcifs',
+                'http = octosearch.indexers.http.http:HttpCrawler',
                 ],
             'octosearch.parser': [
                 'application/pdf = octosearch.parser.pdf:ParserPdf',

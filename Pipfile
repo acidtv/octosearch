@@ -11,6 +11,7 @@ name = "pypi"
 
 [packages]
 
-Flask = "*"
+flask = "*"
 python-ldap = "*"
 pdftotext = "*"
+"bs4" = "*"
