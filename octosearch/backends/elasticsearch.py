@@ -79,24 +79,34 @@ class BackendElasticSearch:
                 }
 
         if not self._user_auth:
+            # only show results that don't need authentication when user not authenticated
             query['query']['bool'].update({
                 'filter': [
                     {'term': {'auth': ''}}
                     ]
                 })
         elif self._user_auth is not None:
-            query['query']['bool'].update({
-                'filter': [
-                    {'term': {'auth': self._user_auth}}
+            # also show non-authenticated results when user *is* authenticated
+            query['query']['bool']['filter'] = {
+                'bool': {
+                    'should': [
+                        {'term': {'auth': ''}}
                     ]
-                })
+                }
+            }
 
             if self._user_groups is not None:
-                query['query']['bool']['filter'].append({
-                        'terms': {
-                            'read_allowed': self._user_groups
-                        }
-                    })
+                # show authenticated results that user is allowed to read according to the _user_groups
+                query['query']['bool']['filter']['bool']['should'].append({
+                    'bool': {
+                        'must': [
+                            {'term': {'auth': self._user_auth}},
+                            {'terms': {'read_allowed': self._user_groups}}
+                        ]
+                    }
+                })
+
+                # do not show results for which users access is denied
                 query['query']['bool'].update({
                     'must_not': {
                         'terms': {
