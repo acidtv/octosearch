@@ -37,7 +37,7 @@
 	margin-bottom: 0;
 }
 
-.example-tile-icon {
+.file-tile-icon {
 	border: 2px solid blue;
 	font-size: .5rem;
 	font-weight: bold;
@@ -46,9 +46,12 @@
 	display: inline-block;
 	position: relative;
 	top: -0.30rem;
+    width: 1.3rem;
+    height: 1.6rem;
+    text-align: center;
 }
 
-.example-tile-icon::before {
+.file-tile-icon::before {
 	display: block;
 	position: absolute;
 	content: "";
