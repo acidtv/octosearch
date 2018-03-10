@@ -12,7 +12,8 @@ setup(
             'octosearch.parser': [
                 'application/pdf = octosearch.parser.pdf:ParserPdf',
                 'text/* = octosearch.parser.text:ParserText',
-                'application/octet-stream = octosearch.parser.fallback:ParserFallback'
+                'application/octet-stream = octosearch.parser.fallback:ParserFallback',
+                'text/html = octosearch.parser.html:ParserHtml',
                 ],
             'octosearch.auth': [
                 'ldap = octosearch.auth.ldaphelper:LDAPAuth',

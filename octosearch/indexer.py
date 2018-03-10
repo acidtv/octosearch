@@ -40,7 +40,7 @@ class Indexer(object):
                 try:
                     document = self.prepare_document(file, conf)
                 except Exception as e:
-                    self.logger.add('Could not prepare document for file %s: %s' % (file, e))
+                    self.logger.add('Could not prepare document for storage %s: %s' % (file, e))
                     continue
 
                 self.backend.add(id, document)
@@ -87,6 +87,9 @@ class Indexer(object):
 
         # file type specific metadata
         document['filetype_metadata'] = filetype_metadata
+
+        if 'title' in filetype_metadata and 'title' not in file.metadata():
+            document['title'] = filetype_metadata['title']
 
         document['auth'] = ''
 
@@ -151,7 +154,7 @@ class LocalFile(File):
         return open(self._path, mode='rb')
 
     def open_text(self):
-        return open(self._path, mode='rt', encoding=self._encoding)
+        return open(self._path, mode='rt')
 
 
 class MemoryFile(File):
