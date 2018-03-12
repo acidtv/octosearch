@@ -9,7 +9,7 @@ class ParserFallback:
 
     def find_words(self, content):
         # match all strings that look like words from 2 to 10 characters long
-        return re.findall(self._pattern + '{2,10}', content, re.IGNORECASE)
+        return re.findall(self._pattern + '{3,20}', content, re.IGNORECASE)
 
     def parse(self, file):
         megabyte = 1024*1024
@@ -33,9 +33,14 @@ class ParserFallback:
                 if content.strip() == '':
                     continue
 
-                # test if first character is a word character
-                if lastword and re.match(self._pattern, content[0], re.IGNORECASE):
-                    content = lastword + content
+                if lastword:
+                    sep = ' '
+
+                    # test if first character is a word character
+                    if re.match(self._pattern, content[0], re.IGNORECASE):
+                        sep = ''
+
+                    content = lastword + sep + content
 
                 result = self.find_words(content)
 
