@@ -39,6 +39,9 @@ class Indexer(object):
 
                 try:
                     document = self.prepare_document(file, conf)
+                except NoParserFoundException as e:
+                    self.logger.add('Skipping file %s: %s' % (metadata['url'], str(e)))
+                    continue
                 except Exception as e:
                     self.logger.add('Could not prepare document for storage %s: %s' % (file, e))
                     continue
@@ -77,6 +80,11 @@ class Indexer(object):
         return hashlib.md5(metadata['url']).hexdigest()
 
     def prepare_document(self, file, conf):
+        mimetype = file.metadata()['mimetype']
+
+        if not self.parsers.have(mimetype):
+            raise NoParserFoundException('No parser found for mimetype %s' % mimetype)
+
         parsed_content, filetype_metadata = self.parse_content(file)
 
         # prepare for adding to backend
@@ -106,7 +114,7 @@ class Indexer(object):
 
     def parse_content(self, file):
         metadata = file.metadata()
-        parser = self.parsers.get(metadata['mimetype'], metadata['extension'])
+        parser = self.parsers.get(metadata['mimetype'])
 
         content = parser.parse(file)
 
@@ -170,3 +178,7 @@ class MemoryFile(File):
 
     def open_text(self):
         return StringIO(self._contents)
+
+
+class NoParserFoundException(Exception):
+    pass
