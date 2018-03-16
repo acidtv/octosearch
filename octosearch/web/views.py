@@ -2,7 +2,7 @@ from . import app, conf
 from flask import render_template, request, session, redirect, url_for
 from .. import backends, plugins
 from werkzeug.exceptions import abort
-import mimetypes
+import os.path
 
 
 def login_redir():
@@ -89,7 +89,7 @@ def prepare_hits(hits):
     for hit in hits:
         if hit['mimetype']:
             try:
-                hit['extension'] = mimetypes.guess_extension(hit['mimetype'])[1:4]
+                hit['extension'] = os.path.splitext(hit['url'])[1].strip('.')[:3]
             except TypeError:
                 hit['extension'] = ''
 
