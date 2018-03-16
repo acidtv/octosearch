@@ -54,7 +54,7 @@ class ParserFallback:
 
                 parsed += self.compact(result[:until])
 
-        return parsed
+        return parsed.decode('utf-8')
 
     def compact(self, regex_result):
         parsed = ''
