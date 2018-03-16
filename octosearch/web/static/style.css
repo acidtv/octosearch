@@ -1,14 +1,14 @@
-.primary {
+.primary, a, a:hover {
 	color: #13538F;
-}
-
-.navbar .sep:before {
-	content: "|";
-	color: #EEE;
 }
 
 .navbar span.btn {
 	color: #50596c
+}
+
+.navbar .navbar-item + .navbar-item:before {
+    content: "|";
+    color: #EEE;
 }
 
 .navbar .navbar-section .btn.btn-link {
