@@ -23,7 +23,7 @@ class Octo:
                 index_job = indexer.Indexer()
                 index_job.logger = log
                 index_job.backend = elastic_backend
-                index_job.parsers = parserplugins.ParserPlugins()
+                index_job.parsers = parserplugins.ParserPlugins(conf.get('parser'))
 
                 indexes = None
 
@@ -61,9 +61,6 @@ if __name__ == '__main__':
         required=False,
         help='Specify a config file. Defaults to config.ini in current folder.',
         default='config.ini')
-    # parser.add_argument('-cr', dest='check_removed', required=False, action='store_true', help='Check index for removed files.')
-    # parser.add_argument('-if', dest='ignore_files', required=False, help='Files to ignore. Regular expressions can be used.')
-    # parser.add_argument('-im', dest='ignore_mimes', required=False, help='Mimetypes to ignore. Regular expressions can be used.')
     args = parser.parse_args()
 
     app = Octo()
