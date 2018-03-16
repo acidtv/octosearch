@@ -20,11 +20,7 @@ class Octo:
                 elastic_backend.truncate()
 
             if args.index is not None:
-                index_job = indexer.Indexer()
-                index_job.logger = log
-                index_job.backend = elastic_backend
-                index_job.parsers = parserplugins.ParserPlugins(conf.get('parser'))
-
+                index_job = indexer.Indexer(logger=log, backend=elastic_backend, parsers=parserplugins.ParserPlugins(conf.get('parser')))
                 indexes = None
 
                 if args.index is True:

@@ -6,24 +6,22 @@ from io import BytesIO, StringIO
 
 class Indexer(object):
 
-    logger = None
+    _logger = None
 
-    indexer = None
+    _backend = None
 
-    backend = None
-
-    parsers = None
-
-    ignore_extensions = []
+    _parsers = None
 
     ignore_mimetypes = []
+
+    def __init__(self, logger, backend, parsers):
+        self._logger = logger
+        self._backend = backend
+        self._parsers = parsers
 
     def index(self, conf):
         indexer = plugins.get('indexer', conf['indexer'])()
         start_time = datetime.datetime.now()
-
-        if 'ignore-extensions' in conf:
-            self.ignore_extensions = conf['ignore-extensions']
 
         for file in indexer.index(conf):
             metadata = file.metadata()
@@ -31,31 +29,31 @@ class Indexer(object):
             backend_document = self.backend_document(id, conf['name'])
 
             if backend_document and not self.modified(metadata, backend_document):
-                self.logger.add(metadata['url'] + ' not modified, updating last seen date')
-                self.backend.add(id, self.last_seen())
+                self._logger.add(metadata['url'] + ' not modified, updating last seen date')
+                self._backend.add(id, self.last_seen())
 
             elif not self.ignore_file(metadata):
-                self.logger.add(metadata['url'] + ' (' + str(metadata['mimetype']) + ')')
+                self._logger.add(metadata['url'] + ' (' + str(metadata['mimetype']) + ')')
 
                 try:
                     document = self.prepare_document(file, conf)
                 except NoParserFoundException as e:
-                    self.logger.add('Skipping file %s: %s' % (metadata['url'], str(e)))
+                    self._logger.add('Skipping file %s: %s' % (metadata['url'], str(e)))
                     continue
                 except Exception as e:
-                    self.logger.add('Could not prepare document for storage %s: %s' % (file, e))
+                    self._logger.add('Could not prepare document for storage %s: %s' % (file, e))
                     continue
 
-                self.backend.add(id, document)
+                self._backend.add(id, document)
 
-        self.logger.add('Purging removed files from index...')
-        self.backend.remove_seen_older_than(self._datetime_to_epoch(start_time))
+        self._logger.add('Purging removed files from index...')
+        self._backend.remove_seen_older_than(self._datetime_to_epoch(start_time))
 
     def backend_document(self, id, sourcename):
         backend_document = None
 
         try:
-            backend_document = self.backend.get_keys([id], sourcename).next()
+            backend_document = self._backend.get_keys([id], sourcename).next()
         except StopIteration:
             pass
         finally:
@@ -68,9 +66,6 @@ class Indexer(object):
         return True
 
     def ignore_file(self, metadata):
-        if metadata['extension'] in self.ignore_extensions:
-            return True
-
         if metadata['mimetype'] in self.ignore_mimetypes:
             return True
 
@@ -82,7 +77,7 @@ class Indexer(object):
     def prepare_document(self, file, conf):
         mimetype = file.metadata()['mimetype']
 
-        if not self.parsers.have(mimetype):
+        if not self._parsers.have(mimetype):
             raise NoParserFoundException('No parser found for mimetype %s' % mimetype)
 
         parsed_content, filetype_metadata = self.parse_content(file)
@@ -114,7 +109,7 @@ class Indexer(object):
 
     def parse_content(self, file):
         metadata = file.metadata()
-        parser = self.parsers.get(metadata['mimetype'])
+        parser = self._parsers.get(metadata['mimetype'])
 
         content = parser.parse(file)
 
