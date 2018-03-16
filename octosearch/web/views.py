@@ -44,7 +44,11 @@ def login():
     if request.method == 'POST':
         success = auth()
 
-    return render_template('login.html', success=success)
+    return render_template(
+        'login.html',
+        success=success,
+        auth_config=get_auth_config()
+    )
 
 
 @app.route('/search')
@@ -106,7 +110,8 @@ def get_backend():
 
 
 def auth():
-    auth_driver = plugins.get('auth', conf.get('auth', 'driver'))(conf.get('auth'))
+    auth_config = get_auth_config()
+    auth_driver = plugins.get('auth', auth_config['driver'])(auth_config)
 
     if not auth_driver.authenticate(request.form['username'], request.form['password']):
         return False
@@ -116,3 +121,7 @@ def auth():
     session['username'] = request.form['username']
 
     return True
+
+
+def get_auth_config():
+    return conf.get('auth')

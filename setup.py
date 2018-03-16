@@ -17,6 +17,7 @@ setup(
                 ],
             'octosearch.auth': [
                 'ldap = octosearch.auth.ldaphelper:LDAPAuth',
+                'basic = octosearch.auth.basic:BasicAuth',
                 ]
             }
         )
