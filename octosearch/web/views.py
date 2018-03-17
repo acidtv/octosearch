@@ -9,9 +9,11 @@ def login_redir():
     if 'username' in session:
         return
 
-    for indexer in conf.get('indexer'):
-        if 'auth' not in indexer:
-            return
+    if conf.get('web', 'login-required') == 'False':
+        for indexer in conf.get('indexer'):
+            if 'auth' not in indexer:
+                # non-auth'ed source found, so login not needed
+                return
 
     return redirect(url_for('login'))
 
