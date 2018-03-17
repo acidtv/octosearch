@@ -31,12 +31,7 @@
                 <div class="columns ">
                     <div class="searchbox column col-12">
                         <img class="logo centered" src="/static/octopus-tmp.svg" />
-                        <div class="input-group input-inline">
-							<form method="get" action="/search">
-								<input name="q" class="form-input" type="text" placeholder="What are you looking for?">
-								<button class="btn btn-secondary input-group-btn">Search</button>
-							</form>
-                        </div>
+						{% include 'snippets/search-bar.html' %}
                     </div>
                 </div>
             </div>

@@ -19,6 +19,10 @@
 	padding: 2rem 0 3rem;
 }
 
+.searchbar form, .searchbar .input-group {
+	width: 100%;
+}
+
 .results .tile {
 	margin-bottom: 1rem;
 	word-break: break-all;

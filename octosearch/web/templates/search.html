@@ -2,13 +2,8 @@
 {% block content %}
 
 	<div class="searchbar columns">
-		<div class="centered">
-			<form method="get" action="/search">
-				<div class="input-group input-inline ">
-					<input name="q" class="form-input" type="text" value="{{query}}" placeholder="What are you looking for?">
-					<button class="btn btn-secondary input-group-btn">Search</button>
-				</div>
-			</form>
+		<div class="column col-sm-12 col-md-8 col-6 col-mx-auto">
+            {% include 'snippets/search-bar.html' %}
 		</div>
 	</div>
 
