@@ -1,0 +1,17 @@
+{% if has_auth_backend %}
+	{% if username %}
+		<span class="navbar-item">
+			<span class="btn btn-link">{{ username }}</span>
+		</span>
+	{% else %}
+		<span class="navbar-item">
+			<a class="btn btn-link" href="/login">Login</a>
+		</span>
+	{% endif %}
+{% endif %}
+
+<!--
+<span class="navbar-item">
+	<a href="" class="btn btn-link">About</a>
+</span>
+-->
