@@ -21,11 +21,13 @@
 
 .results .tile {
 	margin-bottom: 1rem;
+	word-break: break-all;
 }
 
 .results .url {
 	color: #080;
 	font-size: .6rem;
+	word-break: break-all;
 }
 
 .results .tile-title {
@@ -37,11 +39,23 @@
 	margin-bottom: 0;
 }
 
+.pagination {
+	align-items: center;
+	justify-content: center;
+	margin-top: 2rem;
+}
+
+.pagination .page-item.active a {
+	border: 1px solid #13538F;
+	background: none;
+	color: #13538F;
+}
+
 .file-tile-icon {
-	border: 2px solid blue;
+	border: 2px solid #13538F;
 	font-size: .5rem;
 	font-weight: bold;
-	color: blue;
+	color: #13538F;
 	padding: .35rem .10rem;
 	display: inline-block;
 	position: relative;
@@ -58,7 +72,7 @@
 	top: -2px;
 	right: -2px;
 	border-style: solid;
-	border-color: #FFF #FFF blue blue;
+	border-color: #FFF #FFF #13538F #13538F;
 	width: 0;
 	height: 0;
 	border-width: 4px;
