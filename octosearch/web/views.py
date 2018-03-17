@@ -1,5 +1,5 @@
 from . import app, conf
-from flask import render_template, request, session, redirect, url_for
+from flask import render_template, request, session, redirect, url_for, flash
 from .. import backends, plugins
 from werkzeug.exceptions import abort
 import os.path
@@ -42,13 +42,12 @@ def index():
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-    success = None
     if request.method == 'POST':
-        success = auth()
+        if auth():
+            return redirect(url_for('index'))
 
     return render_template(
         'login.html',
-        success=success,
         auth_config=get_auth_config()
     )
 
@@ -121,6 +120,8 @@ def auth():
     session['auth'] = conf.get('auth', 'name')
     session['groups'] = auth_driver.groups()
     session['username'] = request.form['username']
+
+    flash('You were successfully logged in to %s' % conf.get('auth', 'name'), 'success')
 
     return True
 

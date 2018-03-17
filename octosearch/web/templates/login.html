@@ -2,14 +2,8 @@
 {% block content %}
 	<h1>Login</h1>
 
-	{% if success == True %}
-		<p class="success">Login successful</p>
-	{% elif success == False %}
-		<p class="error">Login failed</p>
-	{% endif %}
-
 	<p>
-    You are logging in to {{auth_config.name}}.
+        You are logging in to {{auth_config.name}}.
 	</p>
 
 	<div class="columns">

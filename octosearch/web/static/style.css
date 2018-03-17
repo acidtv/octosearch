@@ -98,9 +98,13 @@
 	width: 100%;
 }
 
-.home header.navbar {
-        position: absolute;
-        width: 100%;
+.home .header {
+    position: absolute;
+    width: 100%;
+}
+
+.home .header .toast {
+    border-radius: 0px;
 }
 
 .home .container .searchbox {
