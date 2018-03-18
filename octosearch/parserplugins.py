@@ -16,8 +16,9 @@ class ParserPlugins(object):
             self._parsers['mimetypes'][plugin.name] = plugin.load()
 
         # add custom mimtype config
-        for mimetype, plugin in conf.iteritems():
-            self._parsers['mimetypes'][mimetype] = plugins.get('parser', plugin)
+        if conf:
+            for mimetype, plugin in conf.iteritems():
+                self._parsers['mimetypes'][mimetype] = plugins.get('parser', plugin)
 
     def have(self, mimetype):
         '''Returns TRUE if parser for mimetype exists, FALSE otherwise'''
