@@ -69,8 +69,9 @@ class BackendElasticSearch:
                 'query': {
                     'bool': {
                         'must': {
-                            'match': {
-                                'content': query_str
+                            'multi_match': {
+                                'query': query_str,
+                                'fields': ['content', 'url']
                                 },
                             },
                         }
