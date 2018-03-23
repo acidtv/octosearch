@@ -14,6 +14,7 @@ setup(
                 'text/* = octosearch.parser.text:ParserText',
                 'application/octet-stream = octosearch.parser.fallback:ParserFallback',
                 'text/html = octosearch.parser.html:ParserHtml',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document = octosearch.parser.docx:ParserDocx'
                 ],
             'octosearch.auth': [
                 'ldap = octosearch.auth.ldaphelper:LDAPAuth',

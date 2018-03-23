@@ -32,7 +32,7 @@ class LDAPAuth(object):
 
     def groups(self):
         '''return groups for authenticated user'''
-        return list(self._auth_driver.groups(self._user_info[1]['memberOf']))
+        return list(self._auth_driver.groups(utf8encode(self._user_info[1]['memberOf'])))
 
 
 class LDAPHelper(object):
@@ -70,13 +70,18 @@ class LDAPHelper(object):
             groups.append(sid)
 
             if 'memberOf' in group[1][0][1]:
-                groups.extend(self.groups(group[1][0][1]['memberOf']))
+                groups.extend(self.groups(utf8encode(group[1][0][1]['memberOf'])))
 
         return set(groups)
 
     def entry(self, dn, attrlist=None):
         dn_result = self._conn.search(dn, ldap.SCOPE_BASE, '(objectclass=*)', attrlist=attrlist)
         return self._conn.result(dn_result)
+
+
+def utf8encode(items):
+    '''utf-8 encodes a list of items'''
+    return [str(s, encoding='utf-8') for s in items]
 
 
 def format_sid(raw_value):
