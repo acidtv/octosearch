@@ -1,4 +1,4 @@
-import plugins
+from . import plugins
 import hashlib
 import datetime
 from io import BytesIO, StringIO
@@ -50,7 +50,7 @@ class Indexer(object):
         backend_document = None
 
         try:
-            backend_document = self._backend.get_keys([id], sourcename).next()
+            backend_document = next(self._backend.get_keys([id], sourcename))
         except StopIteration:
             pass
         finally:
@@ -69,11 +69,11 @@ class Indexer(object):
         return False
 
     def file_id(self, metadata):
-        return hashlib.md5(metadata['url']).hexdigest()
+        return hashlib.md5(metadata['url'].encode()).hexdigest()
 
     def prepare_document(self, file, conf):
         document = file.metadata()
-        parsed_content = u''
+        parsed_content = ''
         filetype_metadata = {}
 
         if self._parsers.have(document['mimetype']):
@@ -110,7 +110,7 @@ class Indexer(object):
 
         content = parser.parse(file)
 
-        if not isinstance(content, unicode):
+        if not isinstance(content, str):
             raise Exception('Parser must return type `unicode`')
 
         # get metadata based on filetype, like image dimensions or compression ratio

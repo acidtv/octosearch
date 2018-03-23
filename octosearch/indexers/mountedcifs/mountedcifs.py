@@ -57,7 +57,7 @@ class Mountedcifs(localfs.Localfs):
         return self._conf['cifs-url'].rstrip('/') + '/' + relative_path.lstrip('/')
 
     def cifs_acls(self, path, file):
-        output = check_output(['getcifsacl', '-r', os.path.join(path, file)])
+        output = str(check_output(['getcifsacl', '-r', os.path.join(path, file)]), encoding='utf-8')
 
         acl = self.parse_cifsacl(output)
         allowed = self.acl_sids(self.filter_acl_read(acl, self.ACE_ACCESS_ALLOWED))

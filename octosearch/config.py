@@ -1,4 +1,4 @@
-import ConfigParser
+import configparser
 
 
 class Config:
@@ -8,7 +8,7 @@ class Config:
     _multi_keys = ['indexer']
 
     def __init__(self, file='config.ini'):
-        config = ConfigParser.SafeConfigParser()
+        config = configparser.SafeConfigParser()
         config.read(file)
         self._config = self.parse(config)
 

@@ -1,9 +1,9 @@
 import requests
 import re
-from Queue import LifoQueue
+from queue import LifoQueue
 from ...indexer import MemoryFile
 from bs4 import BeautifulSoup
-from urlparse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse
 
 
 class HttpCrawler(object):

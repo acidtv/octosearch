@@ -1,8 +1,8 @@
 import os
 import os.path
 import mimetypes
-import urlparse
-import urllib
+import urllib.parse
+import urllib.request, urllib.parse, urllib.error
 
 from ...indexer import LocalFile
 
@@ -82,4 +82,4 @@ class Localfs(object):
 
 def path2url(path, protocol='file'):
     '''Turns filesystem path into url with file: protocol'''
-    return urlparse.urljoin(protocol + ':', urllib.pathname2url(path))
+    return urllib.parse.urljoin(protocol + ':', urllib.request.pathname2url(path))

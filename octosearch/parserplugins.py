@@ -1,4 +1,4 @@
-import plugins
+from . import plugins
 
 
 class ParserPlugins(object):
@@ -17,7 +17,7 @@ class ParserPlugins(object):
 
         # add custom mimtype config
         if conf:
-            for mimetype, plugin in conf.iteritems():
+            for mimetype, plugin in conf.items():
                 self._parsers['mimetypes'][mimetype] = plugins.get('parser', plugin)
 
     def have(self, mimetype):

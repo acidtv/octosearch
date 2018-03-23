@@ -1,4 +1,4 @@
-import plugins
+from . import plugins
 
 class IndexerPlugins(plugins.Plugins):
 

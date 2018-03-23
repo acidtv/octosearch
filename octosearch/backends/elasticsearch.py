@@ -1,4 +1,4 @@
-import httplib
+import http.client
 import json
 
 
@@ -290,11 +290,11 @@ class BackendElasticSearch:
         if content:
             jsondoc = json.dumps(content)
 
-        httpcon = httplib.HTTPConnection(self.server, 9200)
+        httpcon = http.client.HTTPConnection(self.server, 9200)
         httpcon.request(method, url, jsondoc, {'Content-type': 'application/json'})
         response = httpcon.getresponse()
 
-        jsondoc = json.loads(response.read())
+        jsondoc = json.loads(str(response.read(), encoding='utf-8'))
 
         httpcon.close()
 
