@@ -14,7 +14,6 @@ class BasicAuth(object):
 
         pwd_hash = hashlib.md5(password.encode()).hexdigest()
 
-        print(pwd_hash)
         if username == self._conf['username'] and pwd_hash == self._conf['password_hash']:
             return True
 
