@@ -82,7 +82,9 @@ class Indexer(object):
             'mimetype': file.mimetype,
             'created': file.created,
             'modified': file.modified,
-            'size': file.size
+            'size': file.size,
+            'read_allowed': file.read_allowed,
+            'read_denied': file.read_denied
         }
 
         parsed_content = ''
@@ -143,6 +145,9 @@ class File(object):
     created = None
     modified = None
     size = None
+
+    read_allowed = []
+    read_denied = []
 
     _mimetype = None
 
