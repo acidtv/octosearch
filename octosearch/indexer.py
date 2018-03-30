@@ -51,14 +51,7 @@ class Indexer(object):
         self._backend.remove_seen_older_than(self._datetime_to_epoch(start_time))
 
     def backend_document(self, id, sourcename):
-        backend_document = None
-
-        try:
-            backend_document = next(self._backend.get_keys([id], sourcename))
-        except StopIteration:
-            pass
-        finally:
-            return backend_document
+        return self._backend.get(id, sourcename)
 
     def modified(self, file, backend_document):
         if file.modified and (file.modified <= backend_document['modified']):
@@ -77,6 +70,7 @@ class Indexer(object):
 
     def prepare_document(self, file, conf):
         document = {
+            'title': file.title,
             'url': file.url,
             'extension': file.extension,
             'mimetype': file.mimetype,

@@ -1,7 +1,7 @@
 import http.client
 import json
 import elasticsearch
-from elasticsearch_dsl import Search, Q
+from elasticsearch_dsl import Search, Q, Index, DocType, Text, Keyword, Date
 
 
 class BackendElasticSearch:
@@ -9,6 +9,8 @@ class BackendElasticSearch:
     server = None
 
     index = None
+
+    _client = None
 
     # user groups to filter on
     _user_groups = None
@@ -28,30 +30,21 @@ class BackendElasticSearch:
     def __init__(self, server, index):
         self.server = server
         self.index = index
+        self._client = elasticsearch.Elasticsearch(self.server + ':9200')
 
         self.init_index(index)
 
-    def init_index(self, index):
+    def init_index(self, index_name):
         '''Check if index exists, if not create it and set the field mapping'''
-
-        try:
-            self._es_call('get', '/' + index)
-        except ElasticRequestError as e:
-            if self._last_error['status'] != 404:
-                raise e
-
-            self._set_mapping()
+        elastic_index = Index(index_name, using=self._client)
+        elastic_index.doc_type(Document)
+        elastic_index.create(ignore=400)
 
     def add(self, id, info):
         """Add new document to index"""
-
-        document = {
-                'doc': info,
-                'doc_as_upsert': True,
-                }
-
-        # execute upsert
-        self._es_call('post', '/' + self.index + '/' + self._document_type + '/' + id + '/_update', document)
+        doc = Document()
+        doc.meta.id = id
+        doc.update(using=self._client, index=self.index, doc_as_upsert=True, **info)
 
     def auth(self, auth, groups):
         if not isinstance(groups, list):
@@ -60,9 +53,11 @@ class BackendElasticSearch:
         self._user_auth = auth
         self._user_groups = groups
 
-    def _dsl_search(self, query_str, auth=None, page=1):
-        client = elasticsearch.Elasticsearch(self.server + ':9200')
-        s = Search(using=client)
+    def search(self, query_str, auth=None, page=1):
+        s = Search(using=self._client)
+
+        s = s.source(['id', 'path', 'filename', 'created', 'modified', 'mimetype', 'url', 'title'])
+        s = s.highlight('content')
 
         s = s.query("multi_match", query=query_str, fields=['content', 'url'])
 
@@ -80,115 +75,46 @@ class BackendElasticSearch:
             else:
                 s = s.filter(query_empty_auth | query_auth)
 
-        # print(s.to_dict())
-        response = s.execute(ignore_cache=True)
+        # paging
+        page_from = (page - 1) * self._page_size
+        page_size = self._page_size
+        s = s[page_from:page_from+page_size]
 
-        for hit in response:
-            print(hit.url)
+        # FIXME is sorting needed?
+        # 'sort': self._default_sort
 
-        return {'hits': [], 'found': 0}
-
-    def search(self, query_str, auth=None, page=1):
-        query = {
-                '_source': ['id', 'path', 'filename', 'created', 'modified', 'mimetype', 'url', 'title'],
-                'highlight': {
-                    'fields': {
-                        'content': {}
-                        }
-                    },
-                'query': {
-                    'bool': {
-                        'must': {
-                            'multi_match': {
-                                'query': query_str,
-                                'fields': ['content', 'url']
-                                },
-                            },
-                        }
-                    },
-                'sort': self._default_sort
-                }
-
-        if not self._user_auth:
-            # only show results that don't need authentication when user not authenticated
-            query['query']['bool'].update({
-                'filter': [
-                    {'term': {'auth': ''}}
-                    ]
-                })
-        elif self._user_auth is not None:
-            # also show non-authenticated results when user *is* authenticated
-            query['query']['bool']['filter'] = {
-                'bool': {
-                    'should': [
-                        {'term': {'auth': ''}}
-                    ]
-                }
-            }
-
-            if self._user_groups is not None:
-                # show authenticated results that user is allowed to read according to the _user_groups
-                query['query']['bool']['filter']['bool']['should'].append({
-                    'bool': {
-                        'must': [
-                            {'term': {'auth': self._user_auth}},
-                            {'terms': {'read_allowed': self._user_groups}}
-                        ]
-                    }
-                })
-
-                # do not show results for which users access is denied
-                query['query']['bool'].update({
-                    'must_not': {
-                        'terms': {
-                            'read_denied': self._user_groups
-                            }
-                        }
-                    })
-
-        query['from'] = (page - 1) * self._page_size
-        query['size'] = self._page_size
-
-        result = self._es_call('get', '/' + self.index + '/_search', query)
+        response = s.execute()
 
         return {
-            'hits': list(self._format_results(result)),
-            'found': result['hits']['total']
+            'hits': list(self.formatted_hits(response)),
+            'found': response.hits.total
         }
 
-    def get_all(self):
-        '''Generator. Returns the entire index'''
+    def formatted_hits(self, response):
+        for hit in response:
+            formatted_hit = {
+                'id': hit.meta.id,
+                'score': hit.meta.score,
+                'title': hit.title if 'title' in hit else '',
+                'url': hit.url,
+                'created': hit.created,
+                'modified': hit.modified,
+                'mimetype': hit.mimetype,
+            }
 
-        # FIXME use elastic scrolling feature?
-        result = self._es_call('get', '/' + self.index + '/_search', None)
-        for document in self._format_results(result):
-            yield document
+            # not all results have highlights
+            if 'highlight' in hit.meta:
+                formatted_hit['highlight'] = hit.meta.highlight.content
 
-    def get_keys(self, keys, sourcename):
-        '''Returns list with specified keys'''
+            yield formatted_hit
 
-        query = {
-                '_source': ['id', 'path', 'filename', 'created', 'modified', 'mimetype'],
-                'query': {
-                    'bool': {
-                        'filter': [
-                            {'ids': {'type': self._document_type, 'values': keys}},
-                            {'term': {'sourcename': sourcename}}
-                            ]
-                        }
-                    }
-                }
+    def get(self, id, sourcename):
+        s = Search(using=self._client)
+        s = s.source(['id', 'path', 'filename', 'created', 'modified', 'mimetype', 'url', 'title'])
+        s = s.filter(Q('ids', values=[id]) & Q('term', sourcename=sourcename))
 
-        try:
-            result = self._es_call('get', '/' + self.index + '/' + self._document_type + '/_search', query)
-        except ElasticRequestError as e:
-            # if index doesnt exist we get a 404
-            if self._last_error['status'] == 404:
-                return []
-
-            raise e
-
-        return self._format_results(result)
+        response = s.execute()
+        return next(self.formatted_hits(response))
 
     def remove(self, files):
         '''Remove files from index'''
@@ -349,3 +275,23 @@ class BackendElasticSearch:
 
 class ElasticRequestError(Exception):
     pass
+
+
+class Document(DocType):
+
+    title = Text()
+    content = Text()
+    url = Text()
+
+    # FIXME: does Index=True still needs to be set?
+    read_allowed = Keyword(multi=True)
+    read_denied = Keyword(multi=True)
+    sourcename = Keyword()
+    auth = Keyword()
+
+    created = Date()
+    modified = Date()
+    last_seen = Date()
+
+    class Meta:
+        index = 'octosearch'
