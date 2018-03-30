@@ -6,6 +6,7 @@ import mimetypes
 import os
 import urllib.parse
 import urllib.request
+import logging
 
 
 class Indexer(object):
@@ -41,7 +42,7 @@ class Indexer(object):
                 try:
                     document = self.prepare_document(file, conf)
                 except Exception as e:
-                    self._logger.add('Could not prepare document for storage %s: %s' % (file, e))
+                    logging.exception(e)
                     continue
 
                 self._backend.add(id, document)
@@ -60,7 +61,7 @@ class Indexer(object):
             return backend_document
 
     def modified(self, file, backend_document):
-        if file.modified <= backend_document['modified']:
+        if file.modified and (file.modified <= backend_document['modified']):
             return False
 
         return True
@@ -139,6 +140,7 @@ class Indexer(object):
 
 class File(object):
 
+    title = None
     filename = None
     path = None
     url = None
@@ -148,44 +150,29 @@ class File(object):
     modified = None
     size = None
 
-    def __init__(self, filename=None, path=None, url=None, extension=None, mimetype=None, created=None, modified=None, size=None, read_allowed=None, read_denied=None):
-        self.filename = filename
-        self.path = path
-        self.url = url
-        self.extension = extension
-        self.mimetype = mimetype
-        self.created = created
-        self.modified = modified
-        self.size = size
-        self.read_allowed = read_allowed
-        self.read_denied = read_denied
-
 
 class LocalFile(File):
 
     def __init__(self, filename):
-        super().__init__(**kwargs)
-        self._properties()
+        super().__init__()
+        self._properties(filename)
 
     def open(self):
-        return open(self._path, mode='rb')
+        return open(self.filename, mode='rb')
 
-    def _properties(self, path, file):
+    def _properties(self, filename):
         '''Index a file'''
 
-        file_full = os.path.join(path, file)
-        statdata = os.stat(file_full)
+        statdata = os.stat(filename)
 
-        return {
-            filename = file
-            path = path
-            url = path2url(file_full)
-            extension = self._get_extension(file)
-            mimetype = self._get_mimetype(file)
-            created = statdata.st_ctime
-            modified = statdata.st_mtime
-            size = statdata.st_size
-        }
+        self.filename = filename
+        self.path = os.path.split(filename)[0]
+        self.url = path2url(filename)
+        self.extension = self._get_extension(filename)
+        self.mimetype = self._get_mimetype(filename)
+        self.created = statdata.st_ctime
+        self.modified = statdata.st_mtime
+        self.size = statdata.st_size
 
     def _get_extension(self, file):
         info = file.rpartition(os.extsep)
@@ -195,8 +182,8 @@ class LocalFile(File):
 
         return ''
 
-    def _get_mimetype(self, file):
-        mimetype = mimetypes.guess_type(file.filename)[0]
+    def _get_mimetype(self, filename):
+        mimetype = mimetypes.guess_type(filename)[0]
         return mimetype
 
 
@@ -204,9 +191,9 @@ class MemoryFile(File):
 
     _contents = ''
 
-    def __init__(self, contents, **kwargs):
+    def __init__(self, contents):
+        super().__init__()
         self._contents = contents
-        super().__init__(**kwargs)
 
     def open(self):
         return BytesIO(self._contents)

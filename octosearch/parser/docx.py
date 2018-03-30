@@ -7,7 +7,7 @@ class ParserDocx:
 
         content = ''
 
-        with file.open_binary() as f:
+        with file.open() as f:
             doc = Document(f)
 
             for paragraph in doc.paragraphs:

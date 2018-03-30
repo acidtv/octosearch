@@ -25,7 +25,7 @@ class HttpCrawler(object):
 
             r = session.get(url)
 
-            for link in BeautifulSoup(r.content).find_all('a'):
+            for link in BeautifulSoup(r.content, 'lxml').find_all('a'):
                 link_href = link.get('href')
 
                 if not link_href:
@@ -46,13 +46,11 @@ class HttpCrawler(object):
                     found.add(link_href)
                     urls.put(link_href)
 
-            metadata = {
-                'url': url,
-                # FIXME
-                'mimetype': 'text/html',
-                'extension': 'html',
-                'size': 0,
-                'modified': None,
-            }
+            file = MemoryFile(r.content)
+            file.url = url
+            file.mimetype = 'text/html'
+            file.extension = 'html'
+            file.size = 0
+            file.modified = None
 
-            yield MemoryFile(r.content, metadata)
+            yield file

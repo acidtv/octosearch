@@ -8,8 +8,8 @@ class ParserHtml:
     def parse(self, file):
         content = ''
 
-        with file.open_text() as f:
-            soup = BeautifulSoup(f.read(), 'lxml')
+        with file.open() as f:
+            soup = BeautifulSoup(f, 'lxml')
 
         # get_text() sometimes till returns bits of js, make sure those are gone before
         # calling get_text()

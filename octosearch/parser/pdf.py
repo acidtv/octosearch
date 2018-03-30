@@ -10,7 +10,7 @@ class ParserPdf:
                 }
 
     def parse(self, file):
-        with file.open_binary() as f:
+        with file.open() as f:
             pdf = pdftotext.PDF(f)
             pages = len(pdf)
             text = "\n\n".join(pdf)

@@ -1,4 +1,5 @@
 import re
+import io
 
 
 class ParserFallback:
@@ -13,10 +14,9 @@ class ParserFallback:
 
     def parse(self, file):
         megabyte = 1024*1024
-        metadata = file.metadata()
 
         # safety guard, so insanely big blobs won't get indexed
-        if metadata['size'] > (megabyte*10):
+        if file.size > (megabyte*10):
             return ''
 
         content = '1'
@@ -25,7 +25,7 @@ class ParserFallback:
         parsed = ''
         i = 0
 
-        with file.open_binary() as f:
+        with io.TextIOWrapper(file.open(), encoding='utf-8', errors='replace') as f:
             while content:
                 i = i + 1
                 content = f.read(1024)
@@ -54,7 +54,8 @@ class ParserFallback:
 
                 parsed += self.compact(result[:until])
 
-        return parsed.decode('utf-8')
+        print(parsed)
+        return parsed
 
     def compact(self, regex_result):
         parsed = ''
