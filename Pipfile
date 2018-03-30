@@ -1,19 +1,15 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [dev-packages]
 
-
-
 [packages]
-
 flask = "*"
 python-ldap = "*"
 pdftotext = "*"
 "bs4" = "*"
 requests = "*"
 python-docx = "*"
+elasticsearch-dsl = "*"

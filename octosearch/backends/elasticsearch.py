@@ -1,5 +1,7 @@
 import http.client
 import json
+import elasticsearch
+from elasticsearch_dsl import Search, Q
 
 
 class BackendElasticSearch:
@@ -57,6 +59,34 @@ class BackendElasticSearch:
 
         self._user_auth = auth
         self._user_groups = groups
+
+    def _dsl_search(self, query_str, auth=None, page=1):
+        client = elasticsearch.Elasticsearch(self.server + ':9200')
+        s = Search(using=client)
+
+        s = s.query("multi_match", query=query_str, fields=['content', 'url'])
+
+        query_empty_auth = Q('term', auth='')
+
+        if not self._user_auth:
+            s = s.filter(query_empty_auth)
+        elif self._user_auth is not None:
+            query_auth = Q('term', auth=self._user_auth)
+            query_groups = Q('terms', read_allowed=self._user_groups)
+
+            if self._user_groups is not None:
+                s = s.filter(query_empty_auth | (query_groups & query_auth))
+                s = s.exclude('terms', read_denied=self._user_groups)
+            else:
+                s = s.filter(query_empty_auth | query_auth)
+
+        # print(s.to_dict())
+        response = s.execute(ignore_cache=True)
+
+        for hit in response:
+            print(hit.url)
+
+        return {'hits': [], 'found': 0}
 
     def search(self, query_str, auth=None, page=1):
         query = {
