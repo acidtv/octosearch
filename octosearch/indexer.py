@@ -77,8 +77,6 @@ class Indexer(object):
 
     def prepare_document(self, file, conf):
         document = {
-            'filename': file.filename,
-            'path': file.path,
             'url': file.url,
             'extension': file.extension,
             'mimetype': file.mimetype,
@@ -141,50 +139,54 @@ class Indexer(object):
 class File(object):
 
     title = None
-    filename = None
-    path = None
     url = None
-    extension = None
-    mimetype = None
     created = None
     modified = None
     size = None
 
+    _mimetype = None
+
+    @property
+    def extension(self):
+        return os.path.splitext(self.url)[1].strip('.')
+
+    @property
+    def mimetype(self):
+        if self._mimetype:
+            return self._mimetype
+
+        return mimetypes.guess_type(self.url)[0]
+
+    @mimetype.setter
+    def mimetype(self, mimetype):
+        self._mimetype = mimetype
+
 
 class LocalFile(File):
 
-    def __init__(self, filename):
+    # The full local file path
+    path = None
+
+    def __init__(self, path):
         super().__init__()
-        self._properties(filename)
+
+        self.path = path
+        self._set_properties(path)
 
     def open(self):
-        return open(self.filename, mode='rb')
+        return open(self.path, mode='rb')
 
-    def _properties(self, filename):
-        '''Index a file'''
+    def _set_properties(self, path):
+        statdata = os.stat(path)
 
-        statdata = os.stat(filename)
-
-        self.filename = filename
-        self.path = os.path.split(filename)[0]
-        self.url = path2url(filename)
-        self.extension = self._get_extension(filename)
-        self.mimetype = self._get_mimetype(filename)
+        self.url = self._path2url(path)
         self.created = statdata.st_ctime
         self.modified = statdata.st_mtime
         self.size = statdata.st_size
 
-    def _get_extension(self, file):
-        info = file.rpartition(os.extsep)
-
-        if info[0] != '' and info[2] != '':
-            return info[2]
-
-        return ''
-
-    def _get_mimetype(self, filename):
-        mimetype = mimetypes.guess_type(filename)[0]
-        return mimetype
+    def _path2url(self, path, protocol='file'):
+        '''Turns filesystem path into url with file: protocol'''
+        return urllib.parse.urljoin(protocol + ':', urllib.request.pathname2url(path))
 
 
 class MemoryFile(File):
@@ -201,8 +203,3 @@ class MemoryFile(File):
 
 class NoParserFoundException(Exception):
     pass
-
-
-def path2url(path, protocol='file'):
-    '''Turns filesystem path into url with file: protocol'''
-    return urllib.parse.urljoin(protocol + ':', urllib.request.pathname2url(path))

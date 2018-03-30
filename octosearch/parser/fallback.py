@@ -54,7 +54,6 @@ class ParserFallback:
 
                 parsed += self.compact(result[:until])
 
-        print(parsed)
         return parsed
 
     def compact(self, regex_result):

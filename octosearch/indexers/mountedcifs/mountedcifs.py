@@ -1,5 +1,4 @@
 from subprocess import check_output
-import os.path
 from ..localfs import localfs
 
 
@@ -45,17 +44,16 @@ class Mountedcifs(localfs.Localfs):
 
     def set_cifs_properties(self, file):
         file.read_allowed, file.read_denied = self.cifs_acls(file)
-        file.url = self.cifs_url(file.path, file.filename)
+        file.url = self.cifs_url(file)
 
         return file
 
-    def cifs_url(self, path, filename):
-        full_path = os.path.join(path, filename)
-        relative_path = full_path.replace(self._conf['path'], '')
+    def cifs_url(self, file):
+        relative_path = file.path.replace(self._conf['path'], '')
         return self._conf['cifs-url'].rstrip('/') + '/' + relative_path.lstrip('/')
 
     def cifs_acls(self, file):
-        output = str(check_output(['getcifsacl', '-r', os.path.join(file.path, file.filename)]), encoding='utf-8')
+        output = str(check_output(['getcifsacl', '-r', file.path]), encoding='utf-8')
 
         acl = self.parse_cifsacl(output)
         allowed = self.acl_sids(self.filter_acl_read(acl, self.ACE_ACCESS_ALLOWED))
