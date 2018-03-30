@@ -49,7 +49,6 @@ class HttpCrawler(object):
             file = MemoryFile(r.content)
             file.url = url
             file.mimetype = 'text/html'
-            file.extension = 'html'
             file.size = 0
             file.modified = None
 
