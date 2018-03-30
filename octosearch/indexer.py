@@ -1,7 +1,11 @@
 from . import plugins
 import hashlib
 import datetime
-from io import BytesIO, StringIO
+from io import BytesIO
+import mimetypes
+import os
+import urllib.parse
+import urllib.request
 
 
 class Indexer(object):
@@ -24,16 +28,15 @@ class Indexer(object):
         start_time = datetime.datetime.now()
 
         for file in indexer.index(conf):
-            metadata = file.metadata()
-            id = self.file_id(metadata)
+            id = self.file_id(file)
             backend_document = self.backend_document(id, conf['name'])
 
-            if backend_document and not self.modified(metadata, backend_document):
-                self._logger.add(metadata['url'] + ' not modified, updating last seen date')
+            if backend_document and not self.modified(file, backend_document):
+                self._logger.add(file.url + ' not modified, updating last seen date')
                 self._backend.add(id, self.last_seen())
 
-            elif not self.ignore_file(metadata):
-                self._logger.add(metadata['url'] + ' (' + str(metadata['mimetype']) + ')')
+            elif not self.ignore_file(file):
+                self._logger.add(file.url + ' (' + str(file.mimetype) + ')')
 
                 try:
                     document = self.prepare_document(file, conf)
@@ -56,30 +59,40 @@ class Indexer(object):
         finally:
             return backend_document
 
-    def modified(self, metadata, backend_document):
-        if metadata['modified'] <= backend_document['modified']:
+    def modified(self, file, backend_document):
+        if file.modified <= backend_document['modified']:
             return False
 
         return True
 
-    def ignore_file(self, metadata):
-        if metadata['mimetype'] in self.ignore_mimetypes:
+    def ignore_file(self, file):
+        if file.mimetype in self.ignore_mimetypes:
             return True
 
         return False
 
-    def file_id(self, metadata):
-        return hashlib.md5(metadata['url'].encode()).hexdigest()
+    def file_id(self, file):
+        return hashlib.md5(file.url.encode()).hexdigest()
 
     def prepare_document(self, file, conf):
-        document = file.metadata()
+        document = {
+            'filename': file.filename,
+            'path': file.path,
+            'url': file.url,
+            'extension': file.extension,
+            'mimetype': file.mimetype,
+            'created': file.created,
+            'modified': file.modified,
+            'size': file.size
+        }
+
         parsed_content = ''
         filetype_metadata = {}
 
-        if self._parsers.have(document['mimetype']):
+        if self._parsers.have(file.mimetype):
             parsed_content, filetype_metadata = self.parse_content(file)
         else:
-            self._logger.add('No parser found for  %s' % document['url'])
+            self._logger.add('No parser found for  %s' % file.url)
 
         # prepare for adding to backend
         document['sourcename'] = conf['name']
@@ -88,7 +101,7 @@ class Indexer(object):
         # file type specific metadata
         document['filetype_metadata'] = filetype_metadata
 
-        if 'title' in filetype_metadata and 'title' not in file.metadata():
+        if 'title' in filetype_metadata and not file.title:
             document['title'] = filetype_metadata['title']
 
         document['auth'] = ''
@@ -105,8 +118,7 @@ class Indexer(object):
         return document
 
     def parse_content(self, file):
-        metadata = file.metadata()
-        parser = self._parsers.get(metadata['mimetype'])
+        parser = self._parsers.get(file.mimetype)
 
         content = parser.parse(file)
 
@@ -127,50 +139,83 @@ class Indexer(object):
 
 class File(object):
 
-    _encoding = None
+    filename = None
+    path = None
+    url = None
+    extension = None
+    mimetype = None
+    created = None
+    modified = None
+    size = None
 
-    _metadata = {}
-
-    def __init__(self, metadata, encoding=None):
-        self._metadata = metadata
-        self._encoding = encoding
-
-    def encoding(self):
-        # FIXME if no encoding is set try to detect the file encoding
-        return self._encoding
-
-    def metadata(self):
-        return self._metadata
+    def __init__(self, filename=None, path=None, url=None, extension=None, mimetype=None, created=None, modified=None, size=None, read_allowed=None, read_denied=None):
+        self.filename = filename
+        self.path = path
+        self.url = url
+        self.extension = extension
+        self.mimetype = mimetype
+        self.created = created
+        self.modified = modified
+        self.size = size
+        self.read_allowed = read_allowed
+        self.read_denied = read_denied
 
 
 class LocalFile(File):
-    _path = None
 
-    def __init__(self, path, metadata, encoding=None):
-        self._path = path
-        super(LocalFile, self).__init__(metadata, encoding)
+    def __init__(self, filename):
+        super().__init__(**kwargs)
+        self._properties()
 
-    def open_binary(self):
+    def open(self):
         return open(self._path, mode='rb')
 
-    def open_text(self):
-        return open(self._path, mode='rt')
+    def _properties(self, path, file):
+        '''Index a file'''
+
+        file_full = os.path.join(path, file)
+        statdata = os.stat(file_full)
+
+        return {
+            filename = file
+            path = path
+            url = path2url(file_full)
+            extension = self._get_extension(file)
+            mimetype = self._get_mimetype(file)
+            created = statdata.st_ctime
+            modified = statdata.st_mtime
+            size = statdata.st_size
+        }
+
+    def _get_extension(self, file):
+        info = file.rpartition(os.extsep)
+
+        if info[0] != '' and info[2] != '':
+            return info[2]
+
+        return ''
+
+    def _get_mimetype(self, file):
+        mimetype = mimetypes.guess_type(file.filename)[0]
+        return mimetype
 
 
 class MemoryFile(File):
 
     _contents = ''
 
-    def __init__(self, contents, metadata, encoding=None):
+    def __init__(self, contents, **kwargs):
         self._contents = contents
-        super(MemoryFile, self).__init__(metadata, encoding)
+        super().__init__(**kwargs)
 
-    def open_binary(self):
+    def open(self):
         return BytesIO(self._contents)
-
-    def open_text(self):
-        return StringIO(self._contents)
 
 
 class NoParserFoundException(Exception):
     pass
+
+
+def path2url(path, protocol='file'):
+    '''Turns filesystem path into url with file: protocol'''
+    return urllib.parse.urljoin(protocol + ':', urllib.request.pathname2url(path))

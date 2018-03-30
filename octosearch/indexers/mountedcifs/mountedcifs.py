@@ -40,32 +40,28 @@ class Mountedcifs(localfs.Localfs):
 
     def index(self, conf):
         self._conf = conf
-        for file in super(Mountedcifs, self).index(conf):
-            yield file
+        for file in super().index(conf):
+            yield self.set_cifs_properties(file)
 
-    def process_file(self, path, file):
-        metadata = super(Mountedcifs, self).process_file(path, file)
+    def set_cifs_properties(self, file):
+        file.read_allowed, file.read_denied = self.cifs_acls(file)
+        file.url = self.cifs_url(file.path, file.filename)
 
-        metadata.update(self.cifs_acls(path, file))
-        metadata['url'] = self.cifs_url(metadata['path'], metadata['filename'])
+        return file
 
-        return metadata
-
-    def cifs_url(self, path, file):
-        full_path = os.path.join(path, file)
+    def cifs_url(self, path, filename):
+        full_path = os.path.join(path, filename)
         relative_path = full_path.replace(self._conf['path'], '')
         return self._conf['cifs-url'].rstrip('/') + '/' + relative_path.lstrip('/')
 
-    def cifs_acls(self, path, file):
-        output = str(check_output(['getcifsacl', '-r', os.path.join(path, file)]), encoding='utf-8')
+    def cifs_acls(self, file):
+        output = str(check_output(['getcifsacl', '-r', os.path.join(file.path, file.filename)]), encoding='utf-8')
 
         acl = self.parse_cifsacl(output)
         allowed = self.acl_sids(self.filter_acl_read(acl, self.ACE_ACCESS_ALLOWED))
         denied = self.acl_sids(self.filter_acl_read(acl, self.ACE_ACCESS_DENIED))
 
-        info = {'read_allowed': allowed, 'read_denied': denied}
-
-        return info
+        return (allowed, denied)
 
     def parse_cifsacl(self, data):
         '''Parse Access Control List'''

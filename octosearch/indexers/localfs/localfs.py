@@ -1,8 +1,5 @@
 import os
 import os.path
-import mimetypes
-import urllib.parse
-import urllib.request, urllib.parse, urllib.error
 
 from ...indexer import LocalFile
 
@@ -26,28 +23,7 @@ class Localfs(object):
                     dirstack.append(full_path)
                     continue
 
-                yield LocalFile(full_path, self.process_file(path, file))
-
-    def process_file(self, path, file):
-        '''Index a file'''
-
-        file_full = os.path.join(path, file)
-
-        mimetype = self._get_mimetype(file_full)
-        extension = self._get_extension(file)
-        statdata = os.stat(file_full)
-
-        metadata = {}
-        metadata['filename'] = file
-        metadata['path'] = path
-        metadata['url'] = path2url(file_full)
-        metadata['extension'] = extension
-        metadata['mimetype'] = mimetype
-        metadata['created'] = statdata.st_ctime
-        metadata['modified'] = statdata.st_mtime
-        metadata['size'] = statdata.st_size
-
-        return metadata
+                yield LocalFile(full_path)
 
     def check_removed(self):
         '''Check the index for removed files'''
@@ -66,20 +42,3 @@ class Localfs(object):
         if removed:
             self._logger.add('Waiting for search engine to process removed files...')
             self._backend.remove(removed)
-
-    def _get_extension(self, file):
-        info = file.rpartition(os.extsep)
-
-        if info[0] != '' and info[2] != '':
-            return info[2]
-
-        return ''
-
-    def _get_mimetype(self, file):
-        mimetype = mimetypes.guess_type(file)[0]
-        return mimetype
-
-
-def path2url(path, protocol='file'):
-    '''Turns filesystem path into url with file: protocol'''
-    return urllib.parse.urljoin(protocol + ':', urllib.request.pathname2url(path))
