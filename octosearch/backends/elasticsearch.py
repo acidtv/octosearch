@@ -1,21 +1,20 @@
 import elasticsearch
-from elasticsearch_dsl import Search, Q, Index, DocType, Text, Keyword, Date
+from elasticsearch_dsl import Search, Q, Index, DocType, Text, Keyword, Date, connections
 import time
+import datetime
 
 
 class BackendElasticSearch:
 
-    server = None
+    _server = None
 
-    index = None
+    _index_name = None
 
     _client = None
 
     # user groups to filter on
     _user_groups = None
     _user_auth = None
-
-    _last_error = None
 
     _default_sort = [
         {'_score': 'desc'},
@@ -25,29 +24,41 @@ class BackendElasticSearch:
     _page_size = 10
 
     def __init__(self, server, index):
-        self.server = server
-        self.index = index
-        self._client = elasticsearch.Elasticsearch(self.server + ':9200')
+        self._server = server
+        self._index_name = index
 
-        self.init_index(index)
+        connections.create_connection(hosts=[self._server])
+
+        self._init_index()
 
     def _index(self):
-        return Index(self.index, using=self._client)
+        return Index(name=self._index_name)
 
     def _search(self):
-        return Search(index=self.index, using=self._client)
+        return Document.search(index=self._index_name)
 
-    def init_index(self, index_name):
+    def _document(self, id=None, **values):
+        doc = Document(**values)
+        doc.meta.index=self._index_name
+
+        if id:
+            doc.meta.id = id
+
+        return doc
+
+    def _init_index(self):
         '''Check if index exists, if not create it and set the field mapping'''
         elastic_index = self._index()
         elastic_index.doc_type(Document)
         elastic_index.create(ignore=400)
 
-    def add(self, id, info):
+    def create(self, id, info):
         """Add new document to index"""
-        doc = Document()
-        doc.meta.id = id
-        doc.update(using=self._client, index=self.index, doc_as_upsert=True, **info)
+        self._document(id, **info).save()
+
+    def update(self, id, info):
+        """Update a document in the index"""
+        self._document(id).update(**info)
 
     def auth(self, auth, groups):
         if not isinstance(groups, list):
@@ -80,8 +91,7 @@ class BackendElasticSearch:
 
         # paging
         page_from = (page - 1) * self._page_size
-        page_size = self._page_size
-        s = s[page_from:page_from+page_size]
+        s = s[page_from:page_from+self._page_size]
 
         # FIXME is sorting needed?
         # 'sort': self._default_sort
@@ -89,11 +99,11 @@ class BackendElasticSearch:
         response = s.execute()
 
         return {
-            'hits': list(self.formatted_hits(response)),
+            'hits': self._formatted_hits(response),
             'found': response.hits.total
         }
 
-    def formatted_hits(self, response):
+    def _formatted_hits(self, response):
         for hit in response:
             formatted_hit = {
                 'id': hit.meta.id,
@@ -112,7 +122,8 @@ class BackendElasticSearch:
             yield formatted_hit
 
     def get(self, id, sourcename):
-        s = self._search()
+        s = self._document().search()
+
         s = s.source(['id', 'path', 'filename', 'created', 'modified', 'mimetype', 'url', 'title'])
         s = s.filter(Q('ids', values=[id]) & Q('term', sourcename=sourcename))
 
@@ -121,7 +132,7 @@ class BackendElasticSearch:
         if response.hits.total == 0:
             return {}
 
-        return next(self.formatted_hits(response))
+        return next(self._formatted_hits(response))
 
     def truncate(self):
         '''Empty the entire index'''
@@ -165,6 +176,3 @@ class Document(DocType):
     filename = Text(fields={'keyword': Keyword()})
     mimetype = Text(fields={'keyword': Keyword()})
     path = Text(fields={'keyword': Keyword()})
-
-    class Meta:
-        index = 'octosearch'

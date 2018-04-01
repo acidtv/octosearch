@@ -7,6 +7,7 @@ import os
 import urllib.parse
 import urllib.request
 import logging
+import datetime
 
 
 class Indexer(object):
@@ -34,18 +35,24 @@ class Indexer(object):
 
             if backend_document and not self.modified(file, backend_document):
                 self._logger.add(file.url + ' not modified, updating last seen date')
-                self._backend.add(id, self.last_seen())
+                self._backend.update(id, self.last_seen())
+                continue
 
-            elif not self.ignore_file(file):
-                self._logger.add(file.url + ' (' + str(file.mimetype) + ')')
+            if self.ignore_file(file):
+                continue
 
-                try:
-                    document = self.prepare_document(file, conf)
-                except Exception as e:
-                    logging.exception(e)
-                    continue
+            self._logger.add(file.url + ' (' + str(file.mimetype) + ')')
 
-                self._backend.add(id, document)
+            try:
+                document = self.prepare_document(file, conf)
+            except Exception as e:
+                logging.exception(e)
+                continue
+
+            if backend_document:
+                self._backend.update(id, document)
+            else:
+                self._backend.create(id, document)
 
         self._logger.add('Purging removed files from index...')
         self._backend.remove_seen_older_than(self._datetime_to_epoch(start_time))
@@ -108,7 +115,7 @@ class Indexer(object):
 
     def last_seen(self):
         document = {}
-        document['last_seen'] = self._datetime_to_epoch(datetime.datetime.now())
+        document['last_seen'] = datetime.datetime.now()
 
         return document
 
@@ -179,8 +186,8 @@ class LocalFile(File):
         statdata = os.stat(path)
 
         self.url = self._path2url(path)
-        self.created = statdata.st_ctime
-        self.modified = statdata.st_mtime
+        self.created = datetime.datetime.fromtimestamp(statdata.st_ctime)
+        self.modified = datetime.datetime.fromtimestamp(statdata.st_mtime)
         self.size = statdata.st_size
 
     def _path2url(self, path, protocol='file'):
