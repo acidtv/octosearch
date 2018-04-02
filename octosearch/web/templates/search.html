@@ -11,31 +11,31 @@
 
 	<div class="results">
 
-		{% for result in results.hits %}
+		{% for hit in hits %}
 			<div class="tile">
 				<div class="tile-icon">
 					<div class="file-tile-icon">
-                        {{result.extension}}
+                        {{hit.extension}}
 					</div>
 				</div>
 				<div class="tile-content">
 					<p class="tile-title">
-                        <a href="{{result.url}}">
-                            {% if result.title %}
-                                {{result.title}}
-                            {% elif result.filename %}
-                                {{result.filename}}
-                            {% elif result.url %}
-                                {{result.url}}
+                        <a href="{{hit.url}}">
+                            {% if hit.title %}
+                                {{hit.title}}
+                            {% elif hit.filename %}
+                                {{hit.filename}}
+                            {% elif hit.url %}
+                                {{hit.url}}
                             {% endif %}
                         </a>
                     </p>
 					<p class="tile-subtitle text-gray">
-						{% for snippet in result.highlight %}
+						{% for snippet in hit.highlight %}
 							{{snippet|safe}} ...
 						{% endfor %}
 					</p>
-					<span class="url">{{result.url}}</span>
+					<span class="url">{{hit.url}}</span>
 				</div>
 			</div>
 		{% endfor %}

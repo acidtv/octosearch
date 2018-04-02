@@ -69,17 +69,20 @@ def search():
             abort(404)
 
     results = backend.search(query_str=request.args['q'], page=page)
+    enum_hits = list(results['hits'])
+    nr_hits = len(enum_hits)
 
-    if len(results['hits']) == 0 and page > 1:
+    if nr_hits == 0 and page > 1:
         abort(404)
 
-    next_page = None if len(results['hits']) < backend.pagesize() else page + 1
+    next_page = None if nr_hits < backend.pagesize() else page + 1
     prev_page = None if page <= 1 else page - 1
-    results['hits'] = prepare_hits(results['hits'])
+    prepared_hits = prepare_hits(enum_hits)
 
     return render_template(
         'search.html',
         results=results,
+        hits=prepared_hits,
         query=request.args['q'],
         found=results['found'],
         page=page,

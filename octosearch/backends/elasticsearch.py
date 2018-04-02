@@ -107,7 +107,6 @@ class BackendElasticSearch:
         for hit in response:
             formatted_hit = {
                 'id': hit.meta.id,
-                'score': hit.meta.score,
                 'title': hit.title if 'title' in hit else '',
                 'url': hit.url,
                 'created': hit.created,
@@ -147,12 +146,6 @@ class BackendElasticSearch:
 
         s = self._search().query(Q('range', last_seen={'lt': seen}))
         s.delete()
-
-    def _is_error(self, result):
-        return True if 'error' in result else False
-
-    def _get_error_desc(self, result):
-        return result['error']['root_cause'][0]['reason']
 
     def pagesize(self):
         return self._page_size
