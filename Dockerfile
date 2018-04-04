@@ -14,8 +14,8 @@ COPY util/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 EXPOSE 80/tcp
 
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf
-RUN rm -f /etc/nginx/conf.d/default.conf
-COPY util/nginx.conf /etc/nginx/conf.d/
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && echo "daemon off; error_log /dev/stdout info;" >> /etc/nginx/nginx.conf
+RUN rm -f /etc/nginx/sites-enabled/default
+COPY util/nginx.conf /etc/nginx/sites-enabled/default
 
 CMD [ "util/docker-startup.sh" ]
