@@ -1,4 +1,5 @@
 import configparser
+import os
 
 
 class Config:
@@ -35,6 +36,13 @@ class Config:
         return parsed_config
 
     def get(self, section, option=None):
+        if option and (section not in self._multi_keys):
+            # check if config was provided in environment var
+            envname = (section + '_' + option).upper()
+
+            if envname in os.environ:
+                return os.environ[envname]
+
         if section not in self._config:
             return None
 

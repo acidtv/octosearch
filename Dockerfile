@@ -7,7 +7,8 @@ RUN apt-get update && apt-get install -y nginx supervisor build-essential libpop
 
 COPY Pipfile .
 COPY Pipfile.lock .
-RUN pip install --no-cache-dir pipenv uwsgi && export PIPENV_VENV_IN_PROJECT=1 && pipenv install
+ENV PIPENV_VENV_IN_PROJECT=1
+RUN pip install --no-cache-dir pipenv uwsgi && pipenv install
 
 COPY . .
 COPY util/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
