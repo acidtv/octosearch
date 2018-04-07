@@ -31,10 +31,13 @@ class Localfs(object):
                     yield LocalFile(full_path)
                 except Exception as e:
                     logging.exception(e)
-
                     logging.info('Trying to index only the filename for {}', full_path)
-                    memfile = MemoryFile('')
-                    memfile.url = path2url(os.fsdecode(full_path))
-                    memfile.path = full_path
+                    yield self._simple_file(full_path)
 
-                    yield memfile
+    def _simple_file(self, path):
+        '''Returns a MemoryFile object with only the path and url'''
+        memfile = MemoryFile(b'')
+        memfile.url = path2url(os.fsdecode(path))
+        memfile.path = path
+
+        return memfile
