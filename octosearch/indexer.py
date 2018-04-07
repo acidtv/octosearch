@@ -61,7 +61,7 @@ class Indexer(object):
         return self._backend.get(id, sourcename)
 
     def modified(self, file, backend_document):
-        if file.modified and (file.modified <= backend_document['modified']):
+        if file.modified and backend_document['modified'] and (file.modified <= backend_document['modified']):
             return False
 
         return True
@@ -139,6 +139,11 @@ class Indexer(object):
         return (dt - datetime.datetime(1970, 1, 1)).total_seconds()
 
 
+def path2url(path, protocol='file'):
+    '''Turns filesystem path into url with file: protocol'''
+    return urllib.parse.urljoin(protocol + ':', urllib.request.pathname2url(path))
+
+
 class File(object):
 
     title = None
@@ -185,14 +190,10 @@ class LocalFile(File):
     def _set_properties(self, path):
         statdata = os.stat(path)
 
-        self.url = self._path2url(os.fsdecode(path))
+        self.url = path2url(os.fsdecode(path))
         self.created = datetime.datetime.fromtimestamp(statdata.st_ctime)
         self.modified = datetime.datetime.fromtimestamp(statdata.st_mtime)
         self.size = statdata.st_size
-
-    def _path2url(self, path, protocol='file'):
-        '''Turns filesystem path into url with file: protocol'''
-        return urllib.parse.urljoin(protocol + ':', urllib.request.pathname2url(path))
 
 
 class MemoryFile(File):

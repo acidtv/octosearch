@@ -1,7 +1,8 @@
 import os
 import os.path
+import logging
 
-from ...indexer import LocalFile
+from ...indexer import LocalFile, MemoryFile, path2url
 
 
 class Localfs(object):
@@ -26,4 +27,14 @@ class Localfs(object):
                     dirstack.append(full_path)
                     continue
 
-                yield LocalFile(full_path)
+                try:
+                    yield LocalFile(full_path)
+                except Exception as e:
+                    logging.exception(e)
+
+                    logging.info('Trying to index only the filename for {}', full_path)
+                    memfile = MemoryFile('')
+                    memfile.url = path2url(os.fsdecode(full_path))
+                    memfile.path = full_path
+
+                    yield memfile
