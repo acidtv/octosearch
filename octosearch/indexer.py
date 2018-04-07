@@ -7,7 +7,6 @@ import os
 import urllib.parse
 import urllib.request
 import logging
-import datetime
 
 
 class Indexer(object):
@@ -92,7 +91,10 @@ class Indexer(object):
         filetype_metadata = {}
 
         if self._parsers.have(file.mimetype):
-            parsed_content, filetype_metadata = self.parse_content(file)
+            try:
+                parsed_content, filetype_metadata = self.parse_content(file)
+            except Exception as e:
+                logging.exception(e)
         else:
             self._logger.add('No parser found for  %s' % file.url)
 
