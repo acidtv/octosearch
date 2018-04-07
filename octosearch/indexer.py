@@ -185,7 +185,7 @@ class LocalFile(File):
     def _set_properties(self, path):
         statdata = os.stat(path)
 
-        self.url = self._path2url(path)
+        self.url = self._path2url(os.fsdecode(path))
         self.created = datetime.datetime.fromtimestamp(statdata.st_ctime)
         self.modified = datetime.datetime.fromtimestamp(statdata.st_mtime)
         self.size = statdata.st_size

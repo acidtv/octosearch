@@ -9,7 +9,10 @@ class Localfs(object):
     def index(self, conf):
         """Index a directory"""
 
-        dirstack = [conf['path']]
+        # encode to bytes, because that's what the filesystem uses
+        path = os.fsencode(conf['path'])
+
+        dirstack = [path]
 
         # walk filesystem
         while dirstack:
