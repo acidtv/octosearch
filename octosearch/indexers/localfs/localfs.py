@@ -18,8 +18,14 @@ class Localfs(object):
         # walk filesystem
         while dirstack:
             path = dirstack.pop()
+            files = []
 
-            for file in os.listdir(path):
+            try:
+                files = os.listdir(path)
+            except PermissionError as e:
+                logging.error('Could not access %s, skipping', path)
+
+            for file in files:
                 full_path = os.path.join(path, file)
 
                 # if dir add to stack
@@ -31,7 +37,7 @@ class Localfs(object):
                     yield LocalFile(full_path)
                 except Exception as e:
                     logging.exception(e)
-                    logging.info('Trying to index only the filename for {}', full_path)
+                    logging.info('Trying to index only the filename for %s', full_path)
                     yield self._simple_file(full_path)
 
     def _simple_file(self, path):

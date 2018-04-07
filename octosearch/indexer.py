@@ -124,7 +124,11 @@ class Indexer(object):
     def parse_content(self, file):
         parser = self._parsers.get(file.mimetype)
 
-        content = parser.parse(file)
+        try:
+            content = parser.parse(file)
+        except PermissionError:
+            logging.error('Permission denied while trying to parse %s, so we\'re not indexing the contents.', file.url)
+            return '', {}
 
         if not isinstance(content, str):
             raise Exception('Parser must return type `unicode`')
