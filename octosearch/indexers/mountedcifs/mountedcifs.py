@@ -1,5 +1,6 @@
 from subprocess import check_output
 from ..localfs import localfs
+import os
 
 
 class Mountedcifs(localfs.Localfs):
@@ -49,7 +50,7 @@ class Mountedcifs(localfs.Localfs):
         return file
 
     def cifs_url(self, file):
-        relative_path = file.path.replace(self._conf['path'], '')
+        relative_path = os.fsdecode(file.path).replace(self._conf['path'], '')
         return self._conf['cifs-url'].rstrip('/') + '/' + relative_path.lstrip('/')
 
     def cifs_acls(self, file):
