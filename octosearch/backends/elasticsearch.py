@@ -60,6 +60,37 @@ class BackendElasticSearch:
         """Update a document in the index"""
         self._document(id).update(**info)
 
+    def bulk(self, documents):
+        """Takes a documents generator, converts to ES format and passes generator on to ES bulk call"""
+
+        conn = connections.get_connection()
+
+        for result in elasticsearch.helpers.streaming_bulk(
+            client=conn,
+            actions=self._bulk_generator(documents),
+            chunk_size=20
+        ):
+            pass
+
+    def _bulk_generator(self, documents):
+        """Yields actions for bulk requests from documents"""
+        for id, action, document in documents:
+            yield self._bulk_doc_to_dict(id, action, document)
+
+    def _bulk_doc_to_dict(self, id, action, document):
+        document_dict = self._document(id, **document).to_dict(include_meta=True)
+
+        if action == 'update':
+            # set operation type to update, otherwise document is replaced with only
+            # the 'last_seen' field
+            document_dict['_op_type'] = 'update'
+
+            # update action requires fields to be in 'doc' key, not in '_source'
+            document_dict['doc'] = document_dict['_source']
+            del document_dict['_source']
+
+        return document_dict
+
     def auth(self, auth, groups):
         if not isinstance(groups, list):
             raise Exception('groups param must be a list')
@@ -120,18 +151,18 @@ class BackendElasticSearch:
 
             yield formatted_hit
 
-    def get(self, id, sourcename):
+    def get(self, ids, sourcename):
         s = self._document().search()
 
         s = s.source(['id', 'path', 'filename', 'created', 'modified', 'mimetype', 'url', 'title'])
-        s = s.filter(Q('ids', values=[id]) & Q('term', sourcename=sourcename))
+        s = s.filter(Q('ids', values=ids) & Q('term', sourcename=sourcename))
 
         response = s.execute()
 
         if response.hits.total == 0:
-            return {}
+            return []
 
-        return next(self._formatted_hits(response))
+        return self._formatted_hits(response)
 
     def truncate(self):
         '''Empty the entire index'''

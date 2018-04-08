@@ -7,6 +7,7 @@ import os
 import urllib.parse
 import urllib.request
 import logging
+import itertools
 
 
 class Indexer(object):
@@ -28,36 +29,46 @@ class Indexer(object):
         indexer = plugins.get('indexer', conf['indexer'])()
         start_time = datetime.datetime.now()
 
-        for file in indexer.index(conf):
-            id = self.file_id(file)
-            backend_document = self.backend_document(id, conf['name'])
-
-            if backend_document and not self.modified(file, backend_document):
-                self._logger.add(file.url + ' not modified, updating last seen date')
-                self._backend.update(id, self.last_seen())
-                continue
-
-            if self.ignore_file(file):
-                continue
-
-            self._logger.add(file.url + ' (' + str(file.mimetype) + ')')
-
-            try:
-                document = self.prepare_document(file, conf)
-            except Exception as e:
-                logging.exception(e)
-                continue
-
-            if backend_document:
-                self._backend.update(id, document)
-            else:
-                self._backend.create(id, document)
+        documents = self._walk_documents(indexer.index(conf), conf)
+        self._backend.bulk(documents)
 
         self._logger.add('Purging removed files from index...')
         self._backend.remove_seen_older_than(self._datetime_to_epoch(start_time))
 
-    def backend_document(self, id, sourcename):
-        return self._backend.get(id, sourcename)
+    def _walk_documents(self, files, conf):
+        for files_ids in self._group_files_ids(files, 10):
+            # batch get existing docs from backend
+            backend_documents = self._backend_documents(files_ids, conf)
+
+            for file, id in files_ids:
+                backend_document = backend_documents.get(id)
+
+                if self.ignore_file(file):
+                    continue
+
+                action = 'update' if backend_document else 'create'
+
+                if backend_document and not self.modified(file, backend_document):
+                    job = (id, action, self.last_seen())
+                else:
+                    try:
+                        document = self.prepare_document(file, conf)
+                        job = (id, action, document)
+                    except Exception as e:
+                        logging.exception(e)
+                        continue
+
+                logging.info(job[1] + ' ' + file.url + ' (' + str(file.mimetype) + ')')
+
+                yield job
+
+    def _group_files_ids(self, files, size):
+        for slice in iter(lambda: list(itertools.islice(files, size)), []):
+            yield [(file, self.file_id(file)) for file in slice]
+
+    def _backend_documents(self, files_ids, conf):
+        ids = [f[1] for f in files_ids]
+        return dict([(doc['id'], doc) for doc in self._backend.get(ids, conf['name'])])
 
     def modified(self, file, backend_document):
         if file.modified and backend_document['modified'] and (file.modified <= backend_document['modified']):
