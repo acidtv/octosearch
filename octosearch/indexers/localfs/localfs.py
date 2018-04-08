@@ -23,7 +23,7 @@ class Localfs(object):
             try:
                 files = os.listdir(path)
             except PermissionError as e:
-                logging.error('Could not access %s, skipping', path)
+                logging.error('Permission denied for folder: %s, skipping', path)
 
             for file in files:
                 full_path = os.path.join(path, file)
