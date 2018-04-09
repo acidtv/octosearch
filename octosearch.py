@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import logging
 
 from octosearch import web, config, indexer, parserplugins, logger
 from octosearch.backends import elasticsearch
@@ -10,6 +11,7 @@ class Octo:
     def start(self, args):
         conf = config.Config(args.config)
         log = logger.Logger()
+        logging.basicConfig(level=logging.INFO)
 
         if args.webserver:
             web.app.run(debug=True)

@@ -20,6 +20,8 @@ class Indexer(object):
 
     ignore_mimetypes = []
 
+    ingest_batch_size = 50
+
     def __init__(self, logger, backend, parsers):
         self._logger = logger
         self._backend = backend
@@ -36,7 +38,7 @@ class Indexer(object):
         self._backend.remove_seen_older_than(self._datetime_to_epoch(start_time))
 
     def _walk_documents(self, files, conf):
-        for files_ids in self._group_files_ids(files, 10, conf):
+        for files_ids in self._group_files_ids(files, self.ingest_batch_size, conf):
             for id, file, backend_document in files_ids:
                 if self.ignore_file(file):
                     continue
