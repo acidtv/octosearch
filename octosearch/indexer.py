@@ -62,6 +62,7 @@ class Indexer(object):
             # set up basic return dict with file-id and file object
             files_ids = dict([(self.file_id(file), [file, None]) for file in slice])
 
+            # add existing docs
             for doc in self._backend.get(list(files_ids.keys()), conf['name']):
                 files_ids[doc['id']][1] = doc
 
