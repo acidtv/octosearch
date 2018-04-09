@@ -36,13 +36,8 @@ class Indexer(object):
         self._backend.remove_seen_older_than(self._datetime_to_epoch(start_time))
 
     def _walk_documents(self, files, conf):
-        for files_ids in self._group_files_ids(files, 10):
-            # batch get existing docs from backend
-            backend_documents = self._backend_documents(files_ids, conf)
-
-            for file, id in files_ids:
-                backend_document = backend_documents.get(id)
-
+        for files_ids in self._group_files_ids(files, 10, conf):
+            for id, file, backend_document in files_ids:
                 if self.ignore_file(file):
                     continue
 
@@ -62,13 +57,16 @@ class Indexer(object):
 
                 yield job
 
-    def _group_files_ids(self, files, size):
+    def _group_files_ids(self, files, size, conf):
         for slice in iter(lambda: list(itertools.islice(files, size)), []):
-            yield [(file, self.file_id(file)) for file in slice]
+            # set up basic return dict with file-id and file object
+            files_ids = dict([(self.file_id(file), [file, None]) for file in slice])
 
-    def _backend_documents(self, files_ids, conf):
-        ids = [f[1] for f in files_ids]
-        return dict([(doc['id'], doc) for doc in self._backend.get(ids, conf['name'])])
+            for doc in self._backend.get(list(files_ids.keys()), conf['name']):
+                files_ids[doc['id']][1] = doc
+
+            # format and yield
+            yield ([item[0]] + item[1] for item in files_ids.items())
 
     def modified(self, file, backend_document):
         if file.modified and backend_document['modified'] and (file.modified <= backend_document['modified']):
