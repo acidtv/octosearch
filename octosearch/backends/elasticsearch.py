@@ -157,6 +157,9 @@ class BackendElasticSearch:
         s = s.source(['id', 'path', 'filename', 'created', 'modified', 'mimetype', 'url', 'title'])
         s = s.filter(Q('ids', values=ids) & Q('term', sourcename=sourcename))
 
+        # ES returns pages of 10 by default, so set limit to amount of ids.
+        # In case this gets too much for ES we should switch to scanning/scrolling
+        s = s[0:len(ids)]
         response = s.execute()
 
         if response.hits.total == 0:

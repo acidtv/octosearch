@@ -44,9 +44,11 @@ class Indexer(object):
                     continue
 
                 action = 'update' if backend_document else 'create'
+                seen = ''
 
                 if backend_document and not self.modified(file, backend_document):
                     job = (id, action, self.last_seen())
+                    seen = ' last seen'
                 else:
                     try:
                         document = self.prepare_document(file, conf)
@@ -55,7 +57,7 @@ class Indexer(object):
                         logging.exception(e)
                         continue
 
-                logging.info(job[1] + ' ' + file.url + ' (' + str(file.mimetype) + ')')
+                logging.info(job[1] + seen + ' ' + file.url + ' (' + str(file.mimetype) + ')')
 
                 yield job
 
