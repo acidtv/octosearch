@@ -12,8 +12,6 @@ import itertools
 
 class Indexer(object):
 
-    _logger = None
-
     _backend = None
 
     _parsers = None
@@ -22,8 +20,7 @@ class Indexer(object):
 
     ingest_batch_size = 50
 
-    def __init__(self, logger, backend, parsers):
-        self._logger = logger
+    def __init__(self, backend, parsers):
         self._backend = backend
         self._parsers = parsers
 
@@ -34,7 +31,7 @@ class Indexer(object):
         documents = self._walk_documents(indexer.index(conf), conf)
         self._backend.bulk(documents)
 
-        self._logger.add('Purging removed files from index...')
+        logging.info('Purging removed files from index...')
         self._backend.remove_seen_older_than(self._datetime_to_epoch(start_time))
 
     def _walk_documents(self, files, conf):
@@ -110,7 +107,7 @@ class Indexer(object):
             except Exception as e:
                 logging.exception(e)
         else:
-            self._logger.add('No parser found for  %s' % file.url)
+            logging.info('No parser found for  %s' % file.url)
 
         # prepare for adding to backend
         document['sourcename'] = conf['name']

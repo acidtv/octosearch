@@ -3,14 +3,13 @@
 import argparse
 import logging
 
-from octosearch import web, config, indexer, parserplugins, logger
+from octosearch import web, config, indexer, parserplugins
 from octosearch.backends import elasticsearch
 
 
 class Octo:
     def start(self, args):
         conf = config.Config(args.config)
-        log = logger.Logger()
         logging.basicConfig(level=logging.INFO)
 
         if args.webserver:
@@ -22,7 +21,7 @@ class Octo:
                 elastic_backend.truncate()
 
             if args.index is not None:
-                index_job = indexer.Indexer(logger=log, backend=elastic_backend, parsers=parserplugins.ParserPlugins(conf.get('parser')))
+                index_job = indexer.Indexer(backend=elastic_backend, parsers=parserplugins.ParserPlugins(conf.get('parser')))
                 indexes = None
 
                 if args.index is True:
@@ -36,7 +35,7 @@ class Octo:
                         raise Exception('Index not found: %s' % args.index)
 
                 for indexer_conf in indexes:
-                    log.add('Indexing ' + indexer_conf['name'])
+                    logging.info('Indexing ' + indexer_conf['name'])
                     index_job.index(indexer_conf)
 
 
