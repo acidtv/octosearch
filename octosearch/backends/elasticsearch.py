@@ -10,8 +10,6 @@ class BackendElasticSearch:
 
     _index_name = None
 
-    _client = None
-
     # user groups to filter on
     _user_groups = None
     _user_auth = None
@@ -22,6 +20,8 @@ class BackendElasticSearch:
     ]
 
     _page_size = 10
+
+    _bulk_chunk_size = 100
 
     def __init__(self, server, index):
         self._server = server
@@ -39,7 +39,7 @@ class BackendElasticSearch:
 
     def _document(self, id=None, **values):
         doc = Document(**values)
-        doc.meta.index=self._index_name
+        doc.meta.index = self._index_name
 
         if id:
             doc.meta.id = id
@@ -68,7 +68,7 @@ class BackendElasticSearch:
         for result in elasticsearch.helpers.streaming_bulk(
             client=conn,
             actions=self._bulk_generator(documents),
-            chunk_size=20
+            chunk_size=self._bulk_chunk_size
         ):
             pass
 

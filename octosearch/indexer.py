@@ -18,7 +18,7 @@ class Indexer(object):
 
     ignore_mimetypes = []
 
-    ingest_batch_size = 50
+    ingest_batch_size = 100
 
     def __init__(self, backend, parsers):
         self._backend = backend
