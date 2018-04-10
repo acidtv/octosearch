@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import sys
 
 from octosearch import web, config, indexer, parserplugins
 from octosearch.backends import elasticsearch
@@ -61,4 +62,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     app = Octo()
-    app.start(args)
+
+    try:
+        app.start(args)
+    except KeyboardInterrupt:
+        print('Aborting mission, Captain!', file=sys.stderr)
