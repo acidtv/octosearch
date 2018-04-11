@@ -1,15 +1,13 @@
 Octosearch
 ==========
 
-Octosearch is search server. It indexes your local and remote filesystems, internal websites and cloud storage so you can easily find what you're looking for.
+Octosearch is a search server. It indexes your local and remote filesystems, internal websites and cloud storage so you can easily find what you're looking for.
 
 Requirements
 ------------
 
  The project runs on Python 3, most systems will have that installed already. 
  Python dependencies are managed with pipenv, so you'll need that.
-
-### Installing dependencies
 
 Installation
 -----------
