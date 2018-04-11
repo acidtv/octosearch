@@ -2,12 +2,12 @@ version: '2'
 
 services:
     elastic:
-        image: docker.elastic.co/elasticsearch/elasticsearch:6.0.0
+        image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.0.1
         restart: always
 
     octosearch:
+        build: .
         image: octosearch:latest
         restart: always
         environment:
             BACKEND_SERVER: elastic:9200
-

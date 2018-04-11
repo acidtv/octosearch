@@ -1,5 +1,4 @@
 FROM python:3
-#FROM octo-test1
 
 WORKDIR /usr/src/octosearch
 
