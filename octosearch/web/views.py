@@ -1,4 +1,4 @@
-from . import app, conf
+from . import app, conf, protocol
 from flask import render_template, request, session, redirect, url_for, flash
 from .. import backends, plugins
 from werkzeug.exceptions import abort
@@ -28,7 +28,8 @@ def template_vars():
 
     return dict(
         username=username,
-        has_auth_backend=has_auth_backend
+        has_auth_backend=has_auth_backend,
+        register_url=protocol.register(request.host_url, conf.get('web', 'protocol-secret'))
     )
 
 
@@ -100,6 +101,9 @@ def prepare_hits(hits):
                 hit['extension'] = os.path.splitext(hit['url'])[1].strip('.')[:3]
             except TypeError:
                 hit['extension'] = ''
+
+        # Add link to client protocol handler
+        hit['octosearch_url'] = protocol.open(hit['url'], conf.get('web', 'protocol-secret'))
 
         yield hit
 
