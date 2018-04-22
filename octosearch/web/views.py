@@ -20,16 +20,19 @@ def login_redir():
 
 @app.context_processor
 def template_vars():
-    username = session['username'] if 'username' in session else ''
     has_auth_backend = True
 
     if conf.get('auth') is None:
         has_auth_backend = False
 
     return dict(
-        username=username,
+        username=username(),
         has_auth_backend=has_auth_backend,
-        register_url=protocol.register(request.host_url, conf.get('web', 'protocol-secret'))
+        register_url=protocol.register(
+            request.host_url,
+            conf.get('web', 'protocol-secret'),
+            username()
+        )
     )
 
 
@@ -103,7 +106,11 @@ def prepare_hits(hits):
                 hit['extension'] = ''
 
         # Add link to client protocol handler
-        hit['octosearch_url'] = protocol.open(hit['url'], conf.get('web', 'protocol-secret'))
+        hit['octosearch_url'] = protocol.open(
+            hit['url'],
+            conf.get('web', 'protocol-secret'),
+            username()
+        )
 
         yield hit
 
@@ -135,3 +142,7 @@ def auth():
 
 def get_auth_config():
     return conf.get('auth')
+
+
+def username():
+    return session['username'] if 'username' in session else ''
