@@ -25,15 +25,21 @@ def template_vars():
     if conf.get('auth') is None:
         has_auth_backend = False
 
-    return dict(
+    vars = dict(
         username=username(),
         has_auth_backend=has_auth_backend,
-        register_url=protocol.register(
+    )
+
+    user = username()
+
+    if user:
+        vars['register_url'] = protocol.register(
             request.host_url,
             conf.get('web', 'protocol-secret'),
             username()
         )
-    )
+
+    return vars
 
 
 @app.route('/')
@@ -106,11 +112,12 @@ def prepare_hits(hits):
                 hit['extension'] = ''
 
         # Add link to client protocol handler
-        hit['octosearch_url'] = protocol.open(
-            hit['url'],
-            conf.get('web', 'protocol-secret'),
-            username()
-        )
+        if username():
+            hit['octosearch_url'] = protocol.open(
+                hit['url'],
+                conf.get('web', 'protocol-secret'),
+                username()
+            )
 
         yield hit
 
