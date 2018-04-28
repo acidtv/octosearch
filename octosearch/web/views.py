@@ -121,6 +121,10 @@ def prepare_hits(hits):
 
         yield hit
 
+def use_client_protocol(url):
+    browser_protocols = ['http', 'https', 'ftp']
+
+    match = re.match('([a-z]+)\:')
 
 def get_backend():
     backend = backends.elasticsearch.BackendElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))
