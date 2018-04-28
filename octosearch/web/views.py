@@ -55,6 +55,8 @@ def login():
     if request.method == 'POST':
         if auth():
             return redirect(url_for('index'))
+        else:
+            flash('Login failed', 'error')
 
     return render_template(
         'login.html',
