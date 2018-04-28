@@ -114,7 +114,7 @@ def prepare_hits(hits):
                 hit['extension'] = ''
 
         # Add link to client protocol handler
-        if username():
+        if username() and protocol.use_octosearch_protocol(hit['url']):
             hit['octosearch_url'] = protocol.open(
                 hit['url'],
                 conf.get('web', 'protocol-secret'),
@@ -122,11 +122,6 @@ def prepare_hits(hits):
             )
 
         yield hit
-
-def use_client_protocol(url):
-    browser_protocols = ['http', 'https', 'ftp']
-
-    match = re.match('([a-z]+)\:')
 
 def get_backend():
     backend = backends.elasticsearch.BackendElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))

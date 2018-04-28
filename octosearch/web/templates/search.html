@@ -20,7 +20,7 @@
 				</div>
 				<div class="tile-content">
 					<p class="tile-title">
-                        <a class="open-file" href="{{hit.octosearch_url}}">
+						<a class="open-file" href="{% if hit.octosearch_url %}{{hit.octosearch_url}}{% else %}{{hit.url}}{% endif %}">
                             {% if hit.title %}
                                 {{hit.title}}
                             {% elif hit.filename %}

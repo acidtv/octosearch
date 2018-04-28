@@ -2,6 +2,7 @@ import json
 import base64
 import hmac
 import hashlib
+import urllib.parse
 
 PROTOCOL = 'octosearch'
 VERSION = 'v1'
@@ -53,3 +54,13 @@ def _url(action, payload, secret=None, user=None):
         url = url + "/" + h.hexdigest()
 
     return url
+
+
+def use_octosearch_protocol(url):
+    browser_protocols = ['http', 'https', 'ftp']
+
+    if urllib.parse.urlparse(url).scheme in browser_protocols:
+        return False
+
+    return True
+
