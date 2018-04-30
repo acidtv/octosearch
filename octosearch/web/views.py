@@ -1,4 +1,4 @@
-from . import app, conf
+from . import app, conf, protocol
 from flask import render_template, request, session, redirect, url_for, flash
 from .. import backends, plugins
 from werkzeug.exceptions import abort
@@ -20,16 +20,26 @@ def login_redir():
 
 @app.context_processor
 def template_vars():
-    username = session['username'] if 'username' in session else ''
     has_auth_backend = True
 
     if conf.get('auth') is None:
         has_auth_backend = False
 
-    return dict(
-        username=username,
-        has_auth_backend=has_auth_backend
+    vars = dict(
+        username=username(),
+        has_auth_backend=has_auth_backend,
     )
+
+    user = username()
+
+    if user:
+        vars['register_url'] = protocol.register(
+            request.host_url,
+            conf.get('web', 'protocol-secret'),
+            username()
+        )
+
+    return vars
 
 
 @app.route('/')
@@ -45,6 +55,8 @@ def login():
     if request.method == 'POST':
         if auth():
             return redirect(url_for('index'))
+        else:
+            flash('Login failed', 'error')
 
     return render_template(
         'login.html',
@@ -101,8 +113,15 @@ def prepare_hits(hits):
             except TypeError:
                 hit['extension'] = ''
 
-        yield hit
+        # Add link to client protocol handler
+        if username() and protocol.use_octosearch_protocol(hit['url']):
+            hit['octosearch_url'] = protocol.open(
+                hit['url'],
+                conf.get('web', 'protocol-secret'),
+                username()
+            )
 
+        yield hit
 
 def get_backend():
     backend = backends.elasticsearch.BackendElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))
@@ -131,3 +150,7 @@ def auth():
 
 def get_auth_config():
     return conf.get('auth')
+
+
+def username():
+    return session['username'] if 'username' in session else ''

@@ -9,7 +9,7 @@
 
 	<p class="found">Found {{found}} documents.</p>
 
-	<div class="results">
+    <div class="results {% if not username %}no-login{% endif %}">
 
 		{% for hit in hits %}
 			<div class="tile">
@@ -20,7 +20,7 @@
 				</div>
 				<div class="tile-content">
 					<p class="tile-title">
-                        <a href="{{hit.url}}">
+						<a class="open-file" href="{% if hit.octosearch_url %}{{hit.octosearch_url}}{% else %}{{hit.url}}{% endif %}">
                             {% if hit.title %}
                                 {{hit.title}}
                             {% elif hit.filename %}

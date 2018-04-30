@@ -39,7 +39,7 @@ class HttpCrawler(object):
                 if parsed.hostname not in allowed_domains:
                     continue
 
-                if ignore.match(link_href):
+                if conf['ignore'] and ignore.match(link_href):
                     continue
 
                 if link_href not in found:
