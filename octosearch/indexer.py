@@ -41,20 +41,15 @@ class Indexer(object):
                     continue
 
                 action = 'update' if backend_document else 'create'
-                seen = ''
 
-                if backend_document and not self.modified(file, backend_document):
-                    job = (id, action, self.last_seen())
-                    seen = ' last seen'
-                else:
-                    try:
-                        document = self.prepare_document(file, conf)
-                        job = (id, action, document)
-                    except Exception as e:
-                        logging.exception(e)
-                        continue
+                try:
+                    document = self.prepare_document(file, conf, backend_document)
+                    job = (id, action, document)
+                except Exception as e:
+                    logging.exception(e)
+                    continue
 
-                logging.info(job[1] + seen + ' ' + file.url + ' (' + str(file.mimetype) + ')')
+                logging.info(job[1] + ' ' + file.url + ' (' + str(file.mimetype) + ')')
 
                 yield job
 
@@ -95,29 +90,24 @@ class Indexer(object):
             'modified': file.modified,
             'size': file.size,
             'read_allowed': file.read_allowed,
-            'read_denied': file.read_denied
+            'read_denied': file.read_denied,
+            'sourcename' = conf['name'],
+            'last_seen' = datetime.datetime.now(),
         }
 
-        parsed_content = ''
-        filetype_metadata = {}
+        # Parse content if the document is not in the backend yet (new file) or the file is modified,
+        if (not backend_document) or self.modified(file, backend_document):
+            if self._parsers.have(file.mimetype):
+                try:
+                    document['content'], document['filetype_metadata']= self.parse_content(file)
+                except Exception as e:
+                    logging.exception(e)
 
-        if self._parsers.have(file.mimetype):
-            try:
-                parsed_content, filetype_metadata = self.parse_content(file)
-            except Exception as e:
-                logging.exception(e)
-        else:
-            logging.info('No parser found for  %s' % file.url)
-
-        # prepare for adding to backend
-        document['sourcename'] = conf['name']
-        document['last_seen'] = self.last_seen()['last_seen']
-        document['content'] = parsed_content
-        # file type specific metadata
-        document['filetype_metadata'] = filetype_metadata
-
-        if 'title' in filetype_metadata and not file.title:
-            document['title'] = filetype_metadata['title']
+                # If parser extracted a title, add that to the document
+                if 'title' in document['filetype_metadata'] and not file.title:
+                    document['title'] = filetype_metadata['title']
+            else:
+                logging.info('No parser found for  %s' % file.url)
 
         document['auth'] = ''
 
@@ -128,7 +118,7 @@ class Indexer(object):
 
     def last_seen(self):
         document = {}
-        document['last_seen'] = datetime.datetime.now()
+        document['last_seen'] =
 
         return document
 
