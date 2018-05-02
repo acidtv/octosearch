@@ -80,7 +80,7 @@ class Indexer(object):
     def file_id(self, file):
         return hashlib.md5(file.url.encode()).hexdigest()
 
-    def prepare_document(self, file, conf):
+    def prepare_document(self, file, conf, backend_document):
         document = {
             'title': file.title,
             'url': file.url,
@@ -91,21 +91,21 @@ class Indexer(object):
             'size': file.size,
             'read_allowed': file.read_allowed,
             'read_denied': file.read_denied,
-            'sourcename' = conf['name'],
-            'last_seen' = datetime.datetime.now(),
+            'sourcename': conf['name'],
+            'last_seen': datetime.datetime.now(),
         }
 
         # Parse content if the document is not in the backend yet (new file) or the file is modified,
         if (not backend_document) or self.modified(file, backend_document):
             if self._parsers.have(file.mimetype):
                 try:
-                    document['content'], document['filetype_metadata']= self.parse_content(file)
+                    document['content'], document['filetype_metadata'] = self.parse_content(file)
                 except Exception as e:
                     logging.exception(e)
 
                 # If parser extracted a title, add that to the document
                 if 'title' in document['filetype_metadata'] and not file.title:
-                    document['title'] = filetype_metadata['title']
+                    document['title'] = document['filetype_metadata']['title']
             else:
                 logging.info('No parser found for  %s' % file.url)
 
@@ -113,12 +113,6 @@ class Indexer(object):
 
         if 'auth' in conf:
             document['auth'] = conf['auth']
-
-        return document
-
-    def last_seen(self):
-        document = {}
-        document['last_seen'] =
 
         return document
 
