@@ -65,11 +65,10 @@ class BackendElasticSearch:
 
         conn = connections.get_connection()
 
-        for result in elasticsearch.helpers.parallel_bulk(
+        for result in elasticsearch.helpers.streaming_bulk(
             client=conn,
             actions=self._bulk_generator(documents),
             chunk_size=self._bulk_chunk_size,
-            thread_count=4
         ):
             pass
 
