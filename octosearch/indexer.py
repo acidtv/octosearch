@@ -100,12 +100,12 @@ class Indexer(object):
             if self._parsers.have(file.mimetype):
                 try:
                     document['content'], document['filetype_metadata'] = self.parse_content(file)
+
+                    # If parser extracted a title, add that to the document
+                    if 'title' in document['filetype_metadata'] and not file.title:
+                        document['title'] = document['filetype_metadata']['title']
                 except Exception as e:
                     logging.exception(e)
-
-                # If parser extracted a title, add that to the document
-                if 'title' in document['filetype_metadata'] and not file.title:
-                    document['title'] = document['filetype_metadata']['title']
             else:
                 logging.info('No parser found for  %s' % file.url)
 
@@ -130,6 +130,9 @@ class Indexer(object):
 
         # get metadata based on filetype, like image dimensions or compression ratio
         filetype_metadata = parser.extra()
+
+        if not filetype_metadata:
+            filetype_metadata = {}
 
         if not isinstance(filetype_metadata, dict):
             raise Exception('Extra info from parser must be dict')
