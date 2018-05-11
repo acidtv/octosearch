@@ -24,7 +24,6 @@ class Octo:
                 elastic_backend.truncate()
 
             if args.index is not None:
-                print(conf.get('parser'))
                 index_job = indexer.Indexer(backend=elastic_backend, parsers=parserplugins.ParserPlugins(conf.get('parser')))
                 indexes = None
 
