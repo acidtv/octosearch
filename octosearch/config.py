@@ -8,9 +8,15 @@ class Config:
 
     _multi_keys = ['indexer']
 
-    def __init__(self, file='config.ini'):
+    _defaults = 'config-defaults.ini'
+
+    def __init__(self, defaults_dir, file='config.ini'):
         config = configparser.SafeConfigParser()
+
+        defaults_file = open(os.path.join(defaults_dir, self._defaults), 'r')
+        config.read_file(defaults_file)
         config.read(file)
+
         self._config = self.parse(config)
 
     def parse(self, raw_config):
