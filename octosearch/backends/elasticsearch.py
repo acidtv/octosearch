@@ -104,7 +104,7 @@ class BackendElasticSearch:
         s = s.source(['id', 'path', 'filename', 'created', 'modified', 'mimetype', 'url', 'title'])
         s = s.highlight('content')
 
-        s = s.query("multi_match", query=query_str, fields=['content', 'url'])
+        s = s.query("simple_query_string", query=query_str, fields=['content', 'url'], default_operator="and")
 
         query_empty_auth = Q('term', auth='')
 
