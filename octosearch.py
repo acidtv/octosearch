@@ -16,7 +16,6 @@ class Octo:
         logging.basicConfig(level=logging.INFO)
 
         if args.webserver:
-            web.configure(conf)
             web.app.run(debug=True)
         else:
             elastic_backend = elasticsearch.BackendElasticSearch(conf.get('backend', 'server'), conf.get('backend', 'index'))
