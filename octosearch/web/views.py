@@ -3,6 +3,7 @@ from flask import render_template, request, session, redirect, url_for, flash
 from .. import backends, plugins
 from werkzeug.exceptions import abort
 import os.path
+import jinja2
 
 
 def login_redir():
@@ -101,6 +102,14 @@ def search():
         next_page=next_page,
         prev_page=prev_page
     )
+
+
+@app.route('/<string:page>')
+def static_page(page):
+    try:
+        return render_template('static/%s.html' % page)
+    except jinja2.exceptions.TemplateNotFound:
+        abort(404)
 
 
 def prepare_hits(hits):
