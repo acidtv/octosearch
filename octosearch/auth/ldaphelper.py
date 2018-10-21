@@ -32,7 +32,12 @@ class LDAPAuth(object):
 
     def groups(self):
         '''return groups for authenticated user'''
-        return list(self._auth_driver.groups(utf8encode(self._user_info[1]['memberOf'])))
+        group_dns = self._user_info[1].get('memberOf')
+
+        if not group_dns:
+            return []
+
+        return list(self._auth_driver.groups(utf8encode(group_dns)))
 
 
 class LDAPHelper(object):

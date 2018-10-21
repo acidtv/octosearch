@@ -1,0 +1,31 @@
+{% extends "template.html" %}
+{% block content %}
+	<div class="page help">
+		<h1>Help</h1>
+
+		<h2>Search query</h2>
+
+		<div class="search-query">
+			<p>By default the search only matches documents that contain all words in the search query.
+			Words that appear in the title are deemed more important than words matched in the body of the
+			document. So, documents with words from the query in the title will rank higher.</p>
+
+			<p>The search results can be finetuned by using the following special characters:</p>
+
+			<ul class="special-chars">
+				<li><span class="char">+</span> signifies AND operation</li>
+				<li><span class="char">|</span> signifies OR operation</li>
+				<li><span class="char">-</span> negates a single token</li>
+				<li><span class="char">"</span> wraps a number of tokens to signify a phrase for searching</li>
+				<li><span class="char">*</span> at the end of a term signifies a prefix query</li>
+				<li><span class="char">( and )</span> signify precedence</li>
+				<li><span class="char">~N</span> after a word signifies edit distance (fuzziness)</li>
+				<li><span class="char">~N</span> after a phrase signifies slop amount</li>
+			</ul>
+
+			<p>In order to search for any of these special characters, they will need to be escaped with \.</p>
+		</div>
+	</div>
+
+{% endblock %}
+

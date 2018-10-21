@@ -3,6 +3,7 @@
 import argparse
 import logging
 import sys
+import os.path
 
 from octosearch import web, config, indexer, parserplugins
 from octosearch.backends import elasticsearch
@@ -10,7 +11,8 @@ from octosearch.backends import elasticsearch
 
 class Octo:
     def start(self, args):
-        conf = config.Config(args.config)
+        conf_defaults_dir = os.path.dirname(os.path.abspath(__file__))
+        conf = config.Config(conf_defaults_dir, args.config)
         logging.basicConfig(level=logging.INFO)
 
         if args.webserver:

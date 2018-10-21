@@ -68,7 +68,7 @@ class BackendElasticSearch:
         for result in elasticsearch.helpers.streaming_bulk(
             client=conn,
             actions=self._bulk_generator(documents),
-            chunk_size=self._bulk_chunk_size
+            chunk_size=self._bulk_chunk_size,
         ):
             pass
 
@@ -104,7 +104,7 @@ class BackendElasticSearch:
         s = s.source(['id', 'path', 'filename', 'created', 'modified', 'mimetype', 'url', 'title'])
         s = s.highlight('content')
 
-        s = s.query("multi_match", query=query_str, fields=['content', 'url'])
+        s = s.query("simple_query_string", query=query_str, fields=['title^2', 'content', 'url'], default_operator="and")
 
         query_empty_auth = Q('term', auth='')
 
@@ -189,7 +189,10 @@ class Document(DocType):
 
     title = Text()
     content = Text()
-    url = Text()
+
+    # Use simple analyzer, so every part of the url will be a term, including the extension.
+    # The path_hierarchy might be useful too, see https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-pathhierarchy-tokenizer.html
+    url = Text(analyzer='simple')
 
     read_allowed = Keyword(multi=True)
     read_denied = Keyword(multi=True)
