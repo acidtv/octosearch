@@ -24,20 +24,23 @@ class Octo:
                 elastic_backend.truncate()
 
             if args.index is not None:
-                index_job = indexer.Indexer(backend=elastic_backend, parsers=parserplugins.ParserPlugins(conf.get('parser')))
-                indexes = None
+                index_job = indexer.Indexer(
+                        backend=elastic_backend,
+                        parsers=parserplugins.ParserPlugins(
+                            conf.get('mimetypes'),
+                            conf.get('parser')
+                            )
+                        )
 
-                if args.index is True:
-                    indexes = conf.get('indexer')
-                else:
-                    for indexer_conf in conf.get('indexer'):
-                        if indexer_conf['name'] == args.index:
-                            indexes = [indexer_conf]
+                indexes = conf.get('indexer')
 
-                    if indexes is None:
+                if args.index is not True:
+                    if args.index in indexes:
+                        indexes = {args.index: indexes[args.index]}
+                    else:
                         raise Exception('Index not found: %s' % args.index)
 
-                for indexer_conf in indexes:
+                for key, indexer_conf in indexes.items():
                     logging.info('Indexing ' + indexer_conf['name'])
                     index_job.index(indexer_conf)
 

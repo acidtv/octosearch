@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 
 services:
     elastic:
@@ -8,6 +8,11 @@ services:
     octosearch:
         build: .
         image: octosearch:latest
-        restart: always
+        restart: on-failure
         environment:
             BACKEND_SERVER: elastic:9200
+        ports:
+            - "8080:80"
+
+    tika:
+        image: logicalspark/docker-tikaserver

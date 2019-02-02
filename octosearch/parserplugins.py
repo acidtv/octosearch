@@ -7,18 +7,22 @@ class ParserPlugins(object):
             'mimetypes': {},
             }
 
-    def __init__(self, conf):
+    _parserconf = {}
+
+    def __init__(self, conf, parserconf):
         """Load parsers to see which mimetypes they want
             to take care of"""
 
+        self._parserconf = parserconf
+
         # load parsers registered with setuptools
         for plugin in plugins.list('parser'):
-            self._parsers['mimetypes'][plugin.name] = plugin.load()
+            self._parsers['mimetypes'][plugin.name] = (plugin.name, plugin.load())
 
         # add custom mimtype config
         if conf:
             for mimetype, plugin in conf.items():
-                self._parsers['mimetypes'][mimetype] = plugins.get('parser', plugin)
+                self._parsers['mimetypes'][mimetype] = (plugin, plugins.get('parser', plugin))
 
     def have(self, mimetype):
         '''Returns TRUE if parser for mimetype exists, FALSE otherwise'''
@@ -34,4 +38,9 @@ class ParserPlugins(object):
                 return self._parser_factory('mimetypes', mimetype)
 
     def _parser_factory(self, parsertype, key):
-        return self._parsers[parsertype][key]()
+        try:
+            conf = self._parserconf[self._parsers[parsertype][key][0]]
+        except Exception as e:
+            conf = {}
+
+        return self._parsers[parsertype][key][1](conf)

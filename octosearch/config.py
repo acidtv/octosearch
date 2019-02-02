@@ -6,7 +6,7 @@ class Config:
 
     _config = None
 
-    _multi_keys = ['indexer']
+    _multi_keys = ['indexer','parser']
 
     _defaults = 'config-defaults.ini'
 
@@ -23,10 +23,10 @@ class Config:
         parsed_config = {}
 
         for key in self._multi_keys:
-            parsed_config[key] = []
+            parsed_config[key] = {}
 
         for key in raw_config.sections():
-            key_parts = key.split(':')
+            key_parts = key.split(':', maxsplit=1)
 
             data = dict(raw_config.items(key))
 
@@ -35,7 +35,7 @@ class Config:
                     raise Exception('`%s` keys in config file must use a name in the key name, for example [indexer:foo]' % key)
 
                 data['name'] = key_parts[1]
-                parsed_config[key_parts[0]].append(data)
+                parsed_config[key_parts[0]][key_parts[1]] = data
             else:
                 parsed_config[key] = data
 
