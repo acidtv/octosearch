@@ -10,8 +10,11 @@ class ParserTika(object):
         self._conf = conf
 
     def types(self):
-        # FIXME do request to tikaserver to get supported mimes
-        return []
+        headers = {'accept': 'application/json'}
+        response = requests.get(self._conf['url'] + '/mime-types', headers=headers)
+        data = response.json()
+
+        return data.keys()
 
     def parse(self, file):
         headers = {'accept': 'application/json'}
