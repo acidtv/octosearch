@@ -1,9 +1,15 @@
 from bs4 import BeautifulSoup
 
 
-class ParserHtml:
+class ParserHtml(object):
 
     _metadata = {}
+
+    def __init__(self, conf):
+        pass
+
+    def types(self):
+        return ['text/html']
 
     def parse(self, file):
         content = ''

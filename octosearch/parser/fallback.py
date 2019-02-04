@@ -2,11 +2,14 @@ import re
 import io
 
 
-class ParserFallback:
+class ParserFallback(object):
     _pattern = '[a-z]'
 
+    def __init__(self, conf):
+        pass
+
     def types(self):
-        return {'mimetypes': [None]}
+        return []
 
     def find_words(self, content):
         # match all strings that look like words from 2 to 10 characters long

@@ -1,13 +1,14 @@
 import pdftotext
 
 
-class ParserPdf:
+class ParserPdf(object):
     _extra = {}
 
+    def __init__(self, conf):
+        pass
+
     def types(self):
-        return {
-                'mimetypes': ['application/pdf']
-                }
+        return ['application/pdf']
 
     def parse(self, file):
         with file.open() as f:

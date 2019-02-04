@@ -10,12 +10,12 @@ setup(
                 'http = octosearch.indexers.http.http:HttpCrawler',
                 ],
             'octosearch.parser': [
-                'application/pdf = octosearch.parser.pdf:ParserPdf',
-                'text/plain = octosearch.parser.text:ParserText',
-                'application/octet-stream = octosearch.parser.fallback:ParserFallback',
-                'text/html = octosearch.parser.html:ParserHtml',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document = octosearch.parser.docx:ParserDocx',
-                'apache/tika = octosearch.parser.tika:ParserTika',
+                'pdf = octosearch.parser.pdf:ParserPdf',
+                'text = octosearch.parser.text:ParserText',
+                'fallback = octosearch.parser.fallback:ParserFallback',
+                'html = octosearch.parser.html:ParserHtml',
+                'docx = octosearch.parser.docx:ParserDocx',
+                'tika = octosearch.parser.tika:ParserTika',
                 ],
             'octosearch.auth': [
                 'ldap = octosearch.auth.ldaphelper:LDAPAuth',
