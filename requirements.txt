@@ -1,0 +1,8 @@
+beautifulsoup4==4.6.0
+elasticsearch==6.2.0
+elasticsearch-dsl==6.1.0
+Flask==0.12.2
+pdftotext==2.0.2
+python-docx==0.8.6
+python-ldap==3.0.0
+requests==2.18.4
