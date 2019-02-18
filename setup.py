@@ -9,6 +9,7 @@ setup(
                 'mountedcifs = octosearch.indexers.mountedcifs.mountedcifs:Mountedcifs',
                 'http = octosearch.indexers.http.http:HttpCrawler',
                 'pyfilesystem = octosearch.indexers.pyfilesystem.pyfilesystem:Pyfilesystem',
+                'cifs = octosearch.indexers.cifs.cifs:Cifs',
                 ],
             'octosearch.parser': [
                 'pdf = octosearch.parser.pdf:ParserPdf',

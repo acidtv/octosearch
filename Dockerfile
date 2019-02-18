@@ -3,7 +3,10 @@ FROM python:3
 WORKDIR /usr/src/octosearch
 
 # install deps with apt
-RUN apt-get update && apt-get install -y nginx supervisor build-essential libpoppler-cpp-dev pkg-config libldap2-dev libsasl2-dev cifs-utils && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y nginx supervisor build-essential \
+    libpoppler-cpp-dev pkg-config libldap2-dev libsasl2-dev cifs-utils \
+    libsmbclient-dev libsmbclient \
+    && rm -rf /var/lib/apt/lists/*
 
 # install requirements
 COPY requirements.txt .

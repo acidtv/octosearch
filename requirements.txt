@@ -15,3 +15,4 @@ fs.archive==0.6.0
 fs.smbfs==0.5.0
 fs.sshfs==0.10.0
 fs.onedrivefs==0.2.1
+pysmbc==1.0.15.8
