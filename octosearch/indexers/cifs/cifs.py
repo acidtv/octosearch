@@ -87,6 +87,10 @@ class CifsFile(File):
         self._file = file
         self.url = url
 
+        self.created = datetime.datetime.fromtimestamp(statdata.st_ctime)
+        self.modified = datetime.datetime.fromtimestamp(statdata.st_mtime)
+        self.size = statdata.st_size
+
     @contextmanager
     def open(self):
         try:
