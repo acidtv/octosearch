@@ -17,6 +17,7 @@ services:
             - "8080:80"
         volumes:
             - .:/usr/src/octosearch
+        command: sh -c "pip install -e . && util/docker-startup.sh"
 
     tika:
         image: logicalspark/docker-tikaserver
