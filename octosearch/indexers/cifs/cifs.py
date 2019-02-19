@@ -1,5 +1,6 @@
 import smbc
 import os
+import datetime
 from ...indexer import File
 from ..mountedcifs.mountedcifs import parse_cifsace, acl_sids, filter_acl_read, ACE_ACCESS_ALLOWED, ACE_ACCESS_DENIED
 from contextlib import contextmanager
@@ -31,20 +32,25 @@ class Cifs(object):
                     dirstack.append(entry_url)
                     continue
 
-                cifsfile = CifsFile(self._context, entry, entry_url)
+                cifsfile = CifsFile(
+                    self._context,
+                    entry,
+                    entry_url,
+                    self.stat(entry_url)
+                )
+
                 cifsfile.read_allowed, cifsfile.read_denied = self.cifs_acls(entry_url)
-                print(entry_url, cifsfile.read_allowed)
 
                 yield cifsfile
 
     def get_dir_entries(self, url):
         return (entry for entry in self._context.opendir(url).getdents() if entry.name not in ['.', '..'])
 
-    def split_dir_entries(self, entries):
-        return (
-            list(filter(lambda ent: ent.smbc_type == self.DIRENT_TYPE_DIR, entries)),
-            list(filter(lambda ent: ent.smbc_type == self.DIRENT_TYPE_FILE, entries))
-        )
+    def stat(self, url):
+        # https://github.com/hamano/pysmbc/blob/master/smbc/context.c#L470
+        fields = ('mode', 'ino', 'dev', 'nlink', 'uid', 'gid', 'size', 'atime', 'mtime', 'ctime')
+        statdata = dict(zip(fields, self._context.opendir(url)))
+        return statdata
 
     def cifs_acls(self, url):
         perms = self._context.getxattr(url, "system.nt_sec_desc.*")
@@ -80,16 +86,16 @@ class CifsFile(File):
 
     _context = None
 
-    def __init__(self, context, file, url):
+    def __init__(self, context, file, url, statdata):
         super().__init__()
 
         self._context = context
         self._file = file
         self.url = url
 
-        self.created = datetime.datetime.fromtimestamp(statdata.st_ctime)
-        self.modified = datetime.datetime.fromtimestamp(statdata.st_mtime)
-        self.size = statdata.st_size
+        self.created = datetime.datetime.fromtimestamp(statdata['ctime'])
+        self.modified = datetime.datetime.fromtimestamp(statdata['mtime'])
+        self.size = statdata['size']
 
     @contextmanager
     def open(self):
