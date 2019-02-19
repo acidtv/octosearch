@@ -65,7 +65,7 @@ class Cifs(object):
         '''Parse Access Control List'''
         read_perms = []
 
-        for line in data.split("\n"):
+        for line in data.split(","):
             user = parse_cifsace(line)
             if (user):
                 read_perms.append(user)
