@@ -20,7 +20,9 @@ RUN pip install uwsgi && pip install -r requirements.txt
 
 # set up app
 COPY . .
-RUN python3 setup.py develop
+
+# install app in dev mode
+RUN pip3 install -e .
 
 # set up supervisord for uswsgi and nginx
 COPY util/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
