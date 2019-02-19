@@ -5,7 +5,7 @@ WORKDIR /usr/src/octosearch
 # install deps with apt
 RUN apt-get update && apt-get install -y nginx supervisor build-essential \
     libpoppler-cpp-dev pkg-config libldap2-dev libsasl2-dev cifs-utils \
-    libsmbclient-dev libsmbclient \
+    libsmbclient-dev libsmbclient less \
     && rm -rf /var/lib/apt/lists/*
 
 # install requirements

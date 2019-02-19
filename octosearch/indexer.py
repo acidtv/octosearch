@@ -101,7 +101,8 @@ class Indexer(object):
         if (not backend_document) or self.modified(file, backend_document):
             if self._parsers.have(file.mimetype):
                 try:
-                    document['content'], document['filetype_metadata'] = self.parse_content(file)
+                    document['content'], document['filetype_metadata'], parser = self.parse_content(file)
+                    document['parser'] = str(parser)
 
                     # If parser extracted a title, add that to the document
                     if 'title' in document['filetype_metadata'] and not file.title:
@@ -139,7 +140,7 @@ class Indexer(object):
         if not isinstance(filetype_metadata, dict):
             raise Exception('Extra info from parser must be dict')
 
-        return content, filetype_metadata
+        return content, filetype_metadata, parser
 
     def _datetime_to_epoch(self, dt):
         return (dt - datetime.datetime(1970, 1, 1)).total_seconds()

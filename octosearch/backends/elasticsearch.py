@@ -1,5 +1,5 @@
 import elasticsearch
-from elasticsearch_dsl import Search, Q, Index, DocType, Text, Keyword, Date, connections
+from elasticsearch_dsl import Search, Q, Index, DocType, Text, Keyword, Date, connections, Object
 import time
 import datetime
 
@@ -198,6 +198,7 @@ class Document(DocType):
     read_denied = Keyword(multi=True)
     sourcename = Keyword()
     auth = Keyword()
+    parser = Keyword()
 
     created = Date()
     modified = Date()
@@ -206,3 +207,5 @@ class Document(DocType):
     filename = Text(fields={'keyword': Keyword()})
     mimetype = Text(fields={'keyword': Keyword()})
     path = Text(fields={'keyword': Keyword()})
+
+    filetype_metadata = Object()

@@ -23,11 +23,21 @@ class ParserTika(object):
             response = requests.put(self._conf['url'] + '/rmeta/text', data=f, headers=headers)
 
         data = response.json()
+        content = ''
 
-        if 'X-TIKA:content' in data[0]:
-            return data[0]['X-TIKA:content']
+        try:
+            data = data[0]
+        except Exception:
+            raise Exception('Could not parse ' + file.url)
 
-        return ''
+        if 'X-TIKA:content' in data:
+            content = data['X-TIKA:content']
+
+        del data['X-TIKA:content']
+
+        self._extra = data
+
+        return content
 
     def extra(self):
         '''Return extra info'''

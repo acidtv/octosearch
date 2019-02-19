@@ -49,7 +49,7 @@ class Cifs(object):
     def stat(self, url):
         # https://github.com/hamano/pysmbc/blob/master/smbc/context.c#L470
         fields = ('mode', 'ino', 'dev', 'nlink', 'uid', 'gid', 'size', 'atime', 'mtime', 'ctime')
-        statdata = dict(zip(fields, self._context.opendir(url)))
+        statdata = dict(zip(fields, self._context.stat(url)))
         return statdata
 
     def cifs_acls(self, url):
