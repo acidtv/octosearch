@@ -12,12 +12,6 @@ RUN apt-get update && apt-get install -y nginx supervisor build-essential \
 COPY requirements.txt .
 RUN pip install uwsgi && pip install -r requirements.txt
 
-# install deps with pip and pipenv
-#COPY Pipfile .
-#COPY Pipfile.lock .
-#ENV PIPENV_VENV_IN_PROJECT=1
-#RUN pip install --no-cache-dir pipenv uwsgi && pipenv install
-
 # set up app
 COPY . .
 
