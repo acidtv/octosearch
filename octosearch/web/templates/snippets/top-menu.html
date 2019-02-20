@@ -1,8 +1,9 @@
+<span class="navbar-item">
+	<a href="/help" class="btn btn-link">Help</a>
+</span>
+
 {% if has_auth_backend %}
 	{% if username %}
-		<span class="navbar-item">
-			<a href="/help" class="btn btn-link">Help</a>
-		</span>
 		<span class="navbar-item">
 			<a href="{{ register_url }}" class="btn btn-link">Register</a>
 		</span>
