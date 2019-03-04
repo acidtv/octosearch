@@ -3,14 +3,14 @@ version: '2.0'
 services:
     elastic:
         image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.0.1
-        restart: on-failure
+        restart: "no"
         environment:
             - discovery.type=single-node
 
     octosearch:
         build: .
         image: octosearch:latest
-        restart: on-failure
+        restart: "no"
         environment:
             BACKEND_SERVER: elastic:9200
         ports:
@@ -19,4 +19,5 @@ services:
             - .:/usr/src/octosearch
 
     tika:
+        restart: "no"
         image: logicalspark/docker-tikaserver
