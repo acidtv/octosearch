@@ -22,6 +22,9 @@ class ParserTika(object):
         with file.open() as f:
             response = requests.put(self._conf['url'] + '/rmeta/text', data=f, headers=headers)
 
+        if not response.ok:
+            raise Exception('Could not parse ' + file.url + ' with Tika, response code: ' + response.status_code + ', response: ' + response.text)
+
         data = response.json()
         content = ''
 
