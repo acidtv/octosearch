@@ -27,6 +27,10 @@ class ParserTika(object):
             logging.error('Tika does not support the media type of file {} (Got HTTP 415)'.format(file.url))
             return ''
 
+        if response.status_code == 422:
+            logging.error('Tika cannot process this file {}. This can happen if the mime-type is unsupported, the document is encrypted, etc. (Got HTTP 422)'.format(file.url))
+            return ''
+
         if not response.ok:
             raise Exception('Could not parse {} with Tika, response code: {}, response: {}'.format(file.url, response.status_code, response.text))
 
