@@ -32,8 +32,7 @@ class ParserTika(object):
 
         if 'X-TIKA:content' in data:
             content = data['X-TIKA:content']
-
-        del data['X-TIKA:content']
+            del data['X-TIKA:content']
 
         self._extra = data
 
