@@ -1,4 +1,5 @@
 import requests
+import logging
 
 
 class ParserTika(object):
@@ -21,6 +22,10 @@ class ParserTika(object):
 
         with file.open() as f:
             response = requests.put(self._conf['url'] + '/rmeta/text', data=f, headers=headers)
+
+        if response.status_code == 415:
+            logging.error('Tika does not support the media type of file {} (Got HTTP 415)'.format(file.url))
+            return ''
 
         if not response.ok:
             raise Exception('Could not parse {} with Tika, response code: {}, response: {}'.format(file.url, response.status_code, response.text))
