@@ -26,13 +26,15 @@ class Indexer(object):
 
     def index(self, conf):
         indexer = plugins.get('indexer', conf['indexer'])()
+
+        # save start time, so we can later remove files from the index we haven't seen this time
         start_time = datetime.datetime.now()
 
         documents = self._walk_documents(indexer.index(conf), conf)
         self._backend.bulk(documents)
 
         logging.info('Purging removed files from index...')
-        self._backend.remove_seen_older_than(self._datetime_to_epoch(start_time))
+        self._backend.remove_seen_older_than(start_time)
 
     def _walk_documents(self, files, conf):
         """Loop through files and yields jobs for the backend to add or update"""
