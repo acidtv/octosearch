@@ -6,6 +6,7 @@ services:
         restart: "no"
         environment:
             - discovery.type=single-node
+            - index.mapping.total_fields.limit=5000
 
 
     octosearch:
