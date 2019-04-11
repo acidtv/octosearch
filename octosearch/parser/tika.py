@@ -46,7 +46,9 @@ class ParserTika(object):
             content = data['X-TIKA:content']
             del data['X-TIKA:content']
 
-        self._extra = data
+        # Temporarily disable indexing all metadata, because we easily
+        # bump into ES's index.mapping.total_fields.limit
+        # self._extra = data
 
         return content
 
