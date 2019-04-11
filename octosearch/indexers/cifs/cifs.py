@@ -49,7 +49,14 @@ class Cifs(object):
     def stat(self, url):
         # https://github.com/hamano/pysmbc/blob/master/smbc/context.c#L470
         fields = ('mode', 'ino', 'dev', 'nlink', 'uid', 'gid', 'size', 'atime', 'mtime', 'ctime')
-        statdata = dict(zip(fields, self._context.stat(url)))
+
+        try:
+            bare_stat = self._context.stat(url)
+        except Exception as e:
+            raise Exception('Failed to stat "{}": {}'.format(url, str(e))) from e
+
+        statdata = dict(zip(fields, bare_stat))
+
         return statdata
 
     def cifs_acls(self, url):

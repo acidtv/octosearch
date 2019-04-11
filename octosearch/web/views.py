@@ -4,6 +4,7 @@ from .. import backends, plugins
 from werkzeug.exceptions import abort
 import os.path
 import jinja2
+import sys
 
 
 def login_redir():
