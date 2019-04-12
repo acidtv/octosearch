@@ -114,6 +114,7 @@ class CifsFile(File):
         self._file = file
         self.url = url
 
+        self.title = os.fsdecode(os.path.splitext(os.path.basename(url))[0])
         self.created = datetime.datetime.fromtimestamp(statdata['ctime'])
         self.modified = datetime.datetime.fromtimestamp(statdata['mtime'])
         self.size = statdata['size']
