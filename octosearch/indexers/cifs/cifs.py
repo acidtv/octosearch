@@ -1,6 +1,7 @@
 import smbc
 import os
 import datetime
+import logging
 from ...indexer import File
 from ..mountedcifs.mountedcifs import parse_cifsace, acl_sids, filter_acl_read, ACE_ACCESS_ALLOWED, ACE_ACCESS_DENIED
 from contextlib import contextmanager
@@ -32,16 +33,22 @@ class Cifs(object):
                     dirstack.append(entry_url)
                     continue
 
-                cifsfile = CifsFile(
-                    self._context,
-                    entry,
-                    entry_url,
-                    self.stat(entry_url)
-                )
+                try:
+                    yield self.get_file_object(entry, entry_url)
+                except Exception as e:
+                    logging.exception(e)
 
-                cifsfile.read_allowed, cifsfile.read_denied = self.cifs_acls(entry_url)
+    def get_file_object(self, entry, entry_url):
+        cifsfile = CifsFile(
+            self._context,
+            entry,
+            entry_url,
+            self.stat(entry_url)
+        )
 
-                yield cifsfile
+        cifsfile.read_allowed, cifsfile.read_denied = self.cifs_acls(entry_url)
+
+        return cifsfile
 
     def get_dir_entries(self, url):
         return (entry for entry in self._context.opendir(url).getdents() if entry.name not in ['.', '..'])
@@ -49,7 +56,14 @@ class Cifs(object):
     def stat(self, url):
         # https://github.com/hamano/pysmbc/blob/master/smbc/context.c#L470
         fields = ('mode', 'ino', 'dev', 'nlink', 'uid', 'gid', 'size', 'atime', 'mtime', 'ctime')
-        statdata = dict(zip(fields, self._context.stat(url)))
+
+        try:
+            bare_stat = self._context.stat(url)
+        except Exception as e:
+            raise Exception('Failed to stat "{}": {}'.format(url, str(e))) from e
+
+        statdata = dict(zip(fields, bare_stat))
+
         return statdata
 
     def cifs_acls(self, url):
