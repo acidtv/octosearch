@@ -99,8 +99,11 @@ class CifsFile(File):
 
     @contextmanager
     def open(self):
+        f = None
+
         try:
             f = self._context.open(self.url, os.O_RDONLY)
             yield f
         finally:
-            f.close()
+            if f is not None:
+                f.close()
