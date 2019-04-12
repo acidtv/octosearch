@@ -1,6 +1,7 @@
 import smbc
 import os
 import datetime
+import logging
 from ...indexer import File
 from ..mountedcifs.mountedcifs import parse_cifsace, acl_sids, filter_acl_read, ACE_ACCESS_ALLOWED, ACE_ACCESS_DENIED
 from contextlib import contextmanager
