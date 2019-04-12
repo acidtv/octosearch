@@ -32,16 +32,22 @@ class Cifs(object):
                     dirstack.append(entry_url)
                     continue
 
-                cifsfile = CifsFile(
-                    self._context,
-                    entry,
-                    entry_url,
-                    self.stat(entry_url)
-                )
+                try:
+                    yield self.get_file_object(entry, entry_url)
+                except Exception as e:
+                    logging.exception(e)
 
-                cifsfile.read_allowed, cifsfile.read_denied = self.cifs_acls(entry_url)
+    def get_file_object(self, entry, entry_url):
+        cifsfile = CifsFile(
+            self._context,
+            entry,
+            entry_url,
+            self.stat(entry_url)
+        )
 
-                yield cifsfile
+        cifsfile.read_allowed, cifsfile.read_denied = self.cifs_acls(entry_url)
+
+        return cifsfile
 
     def get_dir_entries(self, url):
         return (entry for entry in self._context.opendir(url).getdents() if entry.name not in ['.', '..'])
