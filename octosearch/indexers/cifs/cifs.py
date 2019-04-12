@@ -26,7 +26,14 @@ class Cifs(object):
         while dirstack:
             url = dirstack.pop()
 
-            for entry in self.get_dir_entries(url):
+            try:
+                entries = self.get_dir_entries(url)
+            except smbc.PermissionError as e:
+                logging.error('Permission denied while trying to get dir entries from "{}"'.format(url))
+            except Exception as e:
+                logging.exception(e)
+
+            for entry in entries:
                 entry_url = '/'.join((url.rstrip('/'), entry.name))
 
                 if entry.smbc_type == self.DIRENT_TYPE_DIR:
