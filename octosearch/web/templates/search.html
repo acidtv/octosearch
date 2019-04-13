@@ -37,7 +37,7 @@
 					</p>
 
 					<span class="url">{{hit.url}}</span>
-					<span class="last-seen">last seen: {{hit.last_seen}}</span>
+					<span class="last-seen">last seen: {{hit.last_seen.strftime(('%Y-%m-%d %H:%M'))}}</span>
 				</div>
 			</div>
 		{% endfor %}

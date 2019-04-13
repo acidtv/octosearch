@@ -2,6 +2,7 @@ import elasticsearch
 from elasticsearch_dsl import Search, Q, Index, DocType, Text, Keyword, Date, connections, Object
 import time
 import datetime
+import sys
 
 
 class BackendElasticSearch:
@@ -101,7 +102,7 @@ class BackendElasticSearch:
     def search(self, query_str, auth=None, page=1):
         s = self._search()
 
-        s = s.source(['id', 'path', 'filename', 'created', 'modified', 'mimetype', 'url', 'title'])
+        s = s.source(['id', 'path', 'filename', 'created', 'modified', 'mimetype', 'url', 'title', 'last_seen'])
         s = s.highlight('content')
 
         s = s.query("simple_query_string", query=query_str, fields=['title^2', 'content', 'url'], default_operator="and")
@@ -143,6 +144,7 @@ class BackendElasticSearch:
                 'created': hit.created,
                 'modified': hit.modified,
                 'mimetype': hit.mimetype,
+                'last_seen': hit.last_seen
             }
 
             # not all results have highlights
@@ -154,7 +156,7 @@ class BackendElasticSearch:
     def get(self, ids, sourcename):
         s = self._document().search()
 
-        s = s.source(['id', 'path', 'filename', 'created', 'modified', 'mimetype', 'url', 'title'])
+        s = s.source(['id', 'path', 'filename', 'created', 'modified', 'mimetype', 'url', 'title', 'last_seen'])
         s = s.filter(Q('ids', values=ids) & Q('term', sourcename=sourcename))
 
         # ES returns pages of 10 by default, so set limit to amount of ids.

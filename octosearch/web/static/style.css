@@ -38,6 +38,11 @@ h1 {
 	word-break: break-all;
 }
 
+.results .last-seen {
+	font-size: .6rem;
+	margin-left: 1rem;
+}
+
 .results .tile-title {
 	margin-bottom: .7rem;
 }
