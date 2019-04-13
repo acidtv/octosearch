@@ -16,8 +16,10 @@ services:
             BACKEND_SERVER: elastic:9200
         ports:
             - "8080:80"
+            - "5000:5000"
         volumes:
             - .:/usr/src/octosearch
+        command: /usr/bin/supervisord
 
     tika:
         restart: "no"
