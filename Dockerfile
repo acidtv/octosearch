@@ -28,4 +28,4 @@ COPY util/nginx.conf /etc/nginx/sites-enabled/default
 
 EXPOSE 80/tcp
 
-CMD [ "util/docker-startup.sh" ]
+CMD [ "/usr/bin/supervisord" ]
